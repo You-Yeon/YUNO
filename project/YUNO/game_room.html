@@ -1,0 +1,451 @@
+<!-- client.html -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta charset="utf-8">
+    <title>YUNO</title>
+    <style>
+
+      .chat_log{ width: 95%; height: 120px; }
+      .name{ width: 10%; }
+      .message{ width: 73.5%; }
+      .chat{ width: 10%; }
+
+
+      #jb-container {
+        width: 900px;
+        height: 550px;
+        margin: 0px;
+        padding: 20px;
+        border: 5px solid #07C830;
+        background-color: #DBFED6;
+      }
+      #jb-header {
+        padding: 0px;
+        height: 80px;
+        margin-bottom: 5px;
+        border: 5px solid #07C830;
+        background-color: #2FE652;
+      }
+      #jb-content {
+        width: 180px;
+        height: 190px;
+        padding: 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        float: left;
+        background-color: #6DE688;
+        border: 5px solid #07C830;
+      }
+      #jb-footer {
+        clear: both;
+        height: 180px;
+        padding: 15px 5px 5px 5px;
+        background-color: #9AEBA9;
+        border: 5px solid #07C830;
+      }
+      img { display: block; margin: 0px auto; }
+      a {text-decoration:none; text-shadow: -1.2px 0 black, 0 1.2px black, 1.2px 0 black, 0 -1.2px black;}
+
+    </style>
+  </head>
+  <body>
+
+
+    <div id="jb-container">
+
+      <div id="jb-header" >
+       <img src="/img" alt="My Image" style="height:80px; ">
+      </div>
+
+      <div id="jb-content" style="margin-left: 0px;">
+
+        <table >
+
+          <tr>
+            <td>
+              <img src ="/num1" alt="My Image"style="height:40px; margin-right:10px" align = "left" />
+            </td>
+            <td style="margin:0px;">
+              <font style="font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;" size="5" color="#FFF666">
+                <p style="margin:0px; padding:0px;"id="p1_name"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p1_win"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p1_lose"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2" >
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p1_state"></p>
+              </font>
+            </td>
+          </tr>
+
+        </table>
+
+      </div>
+
+      <div id="jb-content" style="margin-left: 20px;">
+
+        <table>
+
+          <tr>
+            <td>
+              <img src ="/num2" alt="My Image"style="height:40px; margin-right:10px" align = "left" />
+            </td>
+            <td style="margin:0px;">
+              <font style="font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;" size="5" color="#FFF666">
+                <p style="margin:0px; padding:0px;"id="p2_name"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p2_win"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p2_lose"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p2_state"></p>
+              </font>
+            </td>
+          </tr>
+
+        </table>
+
+      </div>
+
+      <div id="jb-content" style="margin-left: 20px;">
+
+        <table>
+
+          <tr>
+            <td>
+              <img src ="/num3" alt="My Image"style="height:40px; margin-right:10px" align = "left" />
+            </td>
+            <td style="margin:0px;">
+              <font style="font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;" size="5" color="#FFF666">
+                <p style="margin:0px; padding:0px;"id="p3_name"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p3_win"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p3_lose"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p3_state"></p>
+              </font>
+            </td>
+          </tr>
+
+        </table>
+
+      </div>
+
+      <div id="jb-content" style="margin-left: 20px;">
+
+        <table>
+
+          <tr>
+            <td>
+              <img src ="/num4" alt="My Image"style="height:40px; margin-right:10px" align = "left" />
+            </td>
+            <td style="margin:0px;">
+              <font style="font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;" size="5" color="#FFF666">
+                <p style="margin:0px; padding:0px;"id="p4_name"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p4_win"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p4_lose"></p>
+              </font>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <font style=" margin: 0px; font-family:DungGeunMo; text-decoration:none; text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black; padding:1px;" size="5" color="#FFF666">
+                <p style=" line-height: 0px; margin:0px; padding:0px;"id="p4_state"></p>
+              </font>
+            </td>
+          </tr>
+
+        </table>
+
+      </div>
+
+      <div id="jb-footer">
+
+        <table>
+          <tr>
+            <td width="650" rowspan="2">
+              <div>
+                <textarea id="chatLog" class="chat_log" readonly style="resize: none"></textarea>
+              </div>
+              <table id = "table">
+              </table>
+              <form id="chat">
+                <input id="name" class="name" type="text" readonly>
+                <input id="message" class="message" type="text">
+                <input type="submit" class="chat" value="chat"/>
+              </form>
+              <div id="box" class="box"></div>
+            </td>
+
+            <td width="80" align="center">
+              <div class = "button1">
+
+              </div>
+            </td>
+
+          </tr>
+
+          <tr>
+            <td width="100" align="center">
+              <input type="submit" onclick="exit()" value="EXIT" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:250px; height:60px; margin:10px; color:#FFF666; font-size:20pt; background-color: #07C830;" />
+
+            </td>
+
+          </tr>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <form name="game_info_form" id="game_info_form"action="http://localhost:9876" method="post">
+      <input type= "hidden" id="room_num" name="room_num" value = "">
+      <input type= "hidden" id="user_name" name="user_name" value = "">
+      <input type= "hidden" id="user_state" name="user_state" value = "">
+      <input type= "hidden" id="user_num" name="user_num" value = "">
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io(); //1
+
+      $('#chat').on('submit', function(e){ //2
+        socket.emit('send message', $('#name').val(), $('#message').val());
+        $('#message').val('');
+        $('#message').focus();
+        e.preventDefault();
+      });
+
+      // $('#host').on('submit', function(e){ //2
+      //   socket.emit('send message', $('#name').val(), $('#message').val());
+      //   $('#message').val('');
+      //   $('#message').focus();
+      //   e.preventDefault();
+      // });
+
+      socket.on('receive message', function(msg){ //3
+        $('#chatLog').append(msg+'\n');
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      });
+
+      socket.on('set name', function(name){
+        $('#name').val(name);
+      });
+
+      socket.on('less member', function(){
+        alert("※ 게임을 시작하려면 2명 이상이여야 합니다. ※");
+      });
+
+      socket.on('unready member', function(){
+        alert("※ 준비하지 않은 플레이어가 있습니다. ※");
+      });
+
+      socket.on('start', function(room_num, user_name, user_state, user_num){
+        document.getElementById('room_num').value = room_num;
+        document.getElementById('user_name').value = user_name;
+        document.getElementById('user_state').value = user_state;
+        document.getElementById('user_num').value = user_num;
+
+        document.getElementById('game_info_form').submit();
+        // alert("※ 게임시작 ※");
+      });
+
+      socket.on('set state', function(state){
+        if(state == 'host'){
+          $('.button1').html('<input type="button" id="host" value="START" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:250px; height:60px; margin:10px; color:#FFF666; font-size:20pt; background-color: #07C830;" />');
+
+          $('#host').click(function(){
+            socket.emit('check_state');
+          });
+        }
+        else if(state == 'unready'){
+          $('.button1').html('<input type="submit" id="unready" value="READY" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:250px; height:60px; margin:10px; color:#FFF666; font-size:20pt; background-color: #07C830;" />');
+
+          $('#unready').click(function(){
+            socket.emit('ready');
+          });
+        }
+        else{ // ready
+          $('.button1').html('<input type="submit" id="ready" value="UNREADY" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:250px; height:60px; margin:10px; color:#FFF666; font-size:20pt; background-color: #07C830;" />');
+
+          $('#ready').click(function(){
+            socket.emit('unready');
+          });
+        }
+      });
+
+      socket.on('clear',function(){
+        $('#p1_name').text('');
+        $('#p1_win').text('');
+        $('#p1_lose').text('');
+        $('#p1_state').text('');
+        $('#p2_name').text('');
+        $('#p2_win').text('');
+        $('#p2_lose').text('');
+        $('#p2_state').text('');
+        $('#p3_name').text('');
+        $('#p3_win').text('');
+        $('#p3_lose').text('');
+        $('#p3_state').text('');
+        $('#p4_name').text('');
+        $('#p4_win').text('');
+        $('#p4_lose').text('');
+        $('#p4_state').text('');
+      });
+
+      socket.on('change value', function(name, win, lose, state, num){
+
+        if(num == 1){
+          $('#p1_name').text(name);
+          $('#p1_win').text(win + " 승");
+          $('#p1_lose').text(lose + " 패");
+          $('#p1_state').text(state);
+
+          if(state == "host"){
+            $('#p1_state').css("color","#FF7B71");
+          }
+          else if(state == "unready"){
+            $('#p1_state').css("color","#75A3FF");
+          }
+          else{
+            $('#p1_state').css("color","#67FF64");
+          }
+        }
+
+        if(num == 2){
+          $('#p2_name').text(name);
+          $('#p2_win').text(win + " 승");
+          $('#p2_lose').text(lose + " 패");
+          $('#p2_state').text(state);
+
+          if(state == "host"){
+            $('#p2_state').css("color","#FF7B71");
+          }
+          else if(state == "unready"){
+            $('#p2_state').css("color","#75A3FF");
+          }
+          else{
+            $('#p2_state').css("color","#67FF64");
+          }
+        }
+
+        if(num == 3){
+          $('#p3_name').text(name);
+          $('#p3_win').text(win + " 승");
+          $('#p3_lose').text(lose + " 패");
+          $('#p3_state').text(state);
+
+          if(state == "host"){
+            $('#p3_state').css("color","#FF7B71");
+          }
+          else if(state == "unready"){
+            $('#p3_state').css("color","#75A3FF");
+          }
+          else{
+            $('#p3_state').css("color","#67FF64");
+          }
+        }
+
+        if(num == 4){
+          $('#p4_name').text(name);
+          $('#p4_win').text(win + " 승");
+          $('#p4_lose').text(lose + " 패");
+          $('#p4_state').text(state);
+
+          if(state == "host"){
+            $('#p4_state').css("color","#FF7B71");
+          }
+          else if(state == "unready"){
+            $('#p4_state').css("color","#75A3FF");
+          }
+          else{
+            $('#p4_state').css("color","#67FF64");
+          }
+        }
+
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+
+      });
+
+      function exit(){
+        history.back();
+      }
+
+    </script>
+  </body>
+</html>
