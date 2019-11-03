@@ -1,10 +1,9 @@
-// server.js
+// yuno_server.js
 
 var express = require('express');
 var app = express();
-var http = require('http').Server(app); //1
-var io = require('socket.io')(http);    //1
-var path = require('path');
+var http = require('http').Server(app); 
+var io = require('socket.io')(http);    
 
 // var session = require('express-session');
 // var FileStore = require('session-file-store')(session);
@@ -18,10 +17,7 @@ var cookieParser = require('cookie-parser');
 //   store: new FileStore()
 // }));
 
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
-
+app.use(bodyParser.urlencoded({ sextended: false }));
 app.use(cookieParser());
 
 var user_name = new Array(new Array());
@@ -35,7 +31,7 @@ var name;
 var win;
 var lose;
 var state;
-var num;
+// var num;
 
 //-------------------------------------------
 
@@ -49,13 +45,13 @@ var num;
 // user_name[1].push(1);
 // user_name[1].push(1);
 
-app.get('/',function(req, res){  //2
+app.get('/',function(req, res){  
 
   res.send(`<script> alert("잘못된 접근"); history.back(); </script>`);
 
 });
 
-app.post('/',function(req, res){  //2
+app.post('/',function(req, res){  
 
   name = req.param('name');
   win = req.param('win');
@@ -200,7 +196,7 @@ io.on('connection', function(socket){
     for( var i = 0; i < user_socketID[room_num].length; i++){
       io.to(user_socketID[room_num][i]).emit('clear');
       for( var j = 0; j < user_name[room_num].length; j++){
-          io.to(user_socketID[room_num][i]).emit('change value',user_name[room_num][j], user_wins[room_num][j], user_losses[room_num][j], user_state[room_num][j], user_num[room_num][j]);
+          io.to(user_socketID[room_num][i]).emit('change value',user_name[room_num][j], user_wins[room_num][j], user_losses[room_num][j], user_state[room_num][j], user_num[room_num][j], user_num[room_num].length);
       }
     }
 
@@ -216,10 +212,9 @@ io.on('connection', function(socket){
       if( user_state[room_num].indexOf('unready') != -1){ // unready true
         io.to(socket.id).emit('unready member');
       }
-      else{ // start
-
+      else{ // start  
         for( var i = 0; i < user_socketID[room_num].length; i++){
-          io.to(user_socketID[room_num][i]).emit('start', user_name[room_num].length, user_name[room_num][i], user_state[room_num][i], user_num[room_num][i]);
+          io.to(user_socketID[room_num][i]).emit('start', user_name.length, user_name[room_num][i], user_state[room_num][i], user_num[room_num][i], user_num[room_num].length);
         }
 
       }

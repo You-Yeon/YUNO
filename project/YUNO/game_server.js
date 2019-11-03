@@ -27,11 +27,13 @@ app.use(cookieParser());
 var g_user_name = new Array(new Array());
 var g_user_num = new Array(new Array());
 var g_user_socketID = new Array(new Array());
-var g_user_state = new Array(new Array());
-var g_room_idx;
+var g_user_cnt = new Array();
+// var g_user_state = new Array(new Array());
+// var g_room_idx;
 var g_name;
 var g_num;
-var g_state;
+var g_cnt;
+// var g_state;
 
 var room_count = 0;
 
@@ -48,39 +50,52 @@ var room_count = 0;
 // user_name[1].push(1);
 
 app.get('/',function(req, res){  //2
-  
-  res.sendFile(__dirname + '/main_game.html');
 
-  // res.send(`<script> alert("잘못된 접근"); history.back(); </script>`);
+  res.send(`<script> alert("잘못된 접근"); history.back(); </script>`);
 
 });
 
-app.post('/',function(req, res){  //2
+app.post('/',function(req, res){ 
 
-  g_room_idx = req.param('room_num');
   g_name = req.param('user_name');
   g_num = req.param('user_num');
-  g_state = req.param('user_state');
+  g_cnt = req.param('user_cnt');
+  // g_room_idx = req.param('room_num');
+  // g_state = req.param('user_state');
 
-  g_user_name[room_count].push(g_name);
-  g_user_num[room_count].push(g_num);
-  g_user_state[room_count].push(g_state);
+  console.log("cookie name :" + req.cookies.NAME);
+  console.log("user_name :" + req.param('user_name'));
+  console.log("user_num :" + req.param('user_num'));
+  console.log("user_cnt :" + req.param('user_cnt'));
 
-  if( g_user_socketID[room_count].length == g_room_idx ){
 
-    room_count = room_count + 1;
+  // make array
+  if(g_user_name[room_count] === undefined){
+
     g_user_name[room_count] = new Array();
     g_user_num[room_count] = new Array();
     g_user_socketID[room_count] = new Array();
-    g_user_state[room_count] = new Array();
-
+    // g_user_state[room_count] = new Array();
   }
 
-  console.log(req.cookies.NAME);
-  console.log(req.param('room_num'));
-  console.log(req.param('user_name'));
-  console.log(req.param('user_state'));
-  console.log(req.param('user_num'));
+  // check room number
+  if (g_user_name[room_count].length < g_cnt - 1){
+
+    g_user_name[room_count].push(g_name);
+    g_user_num[room_count].push(g_num);
+  }
+  else{
+
+    g_user_name[room_count].push(g_name);
+    g_user_num[room_count].push(g_num);
+    g_user_cnt.push(g_cnt);
+
+    room_count++;
+  }
+
+  console.log(g_user_name);
+  console.log(g_user_num);
+  console.log(g_user_cnt);
 
   res.sendFile(__dirname + '/main_game.html');
 

@@ -23,7 +23,7 @@
       }
       #jb-content {
         width: 490px;
-        height: 530px;
+        height: 580px;
         padding: 10px;
         margin-bottom: 20px;
         float: left;

@@ -273,10 +273,11 @@
     </div>
 
     <form name="game_info_form" id="game_info_form"action="http://localhost:9876" method="post">
-      <input type= "hidden" id="room_num" name="room_num" value = "">
       <input type= "hidden" id="user_name" name="user_name" value = "">
-      <input type= "hidden" id="user_state" name="user_state" value = "">
       <input type= "hidden" id="user_num" name="user_num" value = "">
+      <input type= "hidden" id="user_cnt" name="user_cnt" value = "">
+      <!-- <input type= "hidden" id="room_num" name="room_num" value = "">
+      <input type= "hidden" id="user_state" name="user_state" value = ""> -->
     </form>
 
     <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
@@ -315,11 +316,12 @@
         alert("※ 준비하지 않은 플레이어가 있습니다. ※");
       });
 
-      socket.on('start', function(room_num, user_name, user_state, user_num){
-        document.getElementById('room_num').value = room_num;
+      socket.on('start', function(room_num, user_name, user_state, user_num, user_cnt){
         document.getElementById('user_name').value = user_name;
-        document.getElementById('user_state').value = user_state;
         document.getElementById('user_num').value = user_num;
+        document.getElementById('user_cnt').value = user_cnt;
+        // document.getElementById('room_num').value = room_num;
+        // document.getElementById('user_state').value = user_state;
 
         document.getElementById('game_info_form').submit();
         // alert("※ 게임시작 ※");
