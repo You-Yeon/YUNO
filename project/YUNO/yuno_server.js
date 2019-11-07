@@ -2,20 +2,13 @@
 
 var express = require('express');
 var app = express();
+var routes = require('./img_routes'); // img routers
+app.use('/',routes);
+
 var http = require('http').Server(app); 
 var io = require('socket.io')(http);    
-
-// var session = require('express-session');
-// var FileStore = require('session-file-store')(session);
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-
-// app.use(session({
-//   secret: 'keyboard cat',
-//   resave: false,
-//   saveUninitialized: true,
-//   store: new FileStore()
-// }));
 
 app.use(bodyParser.urlencoded({ sextended: false }));
 app.use(cookieParser());
@@ -31,7 +24,6 @@ var name;
 var win;
 var lose;
 var state;
-// var num;
 
 //-------------------------------------------
 
@@ -123,27 +115,6 @@ app.post('/',function(req, res){
 
 //-----------------------------------------------------------
 
-app.get('/img', function(req, res){
-  res.sendFile(__dirname + '/images/1.png');
-});
-
-app.get('/num1', function(req, res){
-  res.sendFile(__dirname + '/assets/num_button_1.png');
-});
-
-app.get('/num2', function(req, res){
-  res.sendFile(__dirname + '/assets/num_button_2.png');
-});
-
-app.get('/num3', function(req, res){
-  res.sendFile(__dirname + '/assets/num_button_3.png');
-});
-
-app.get('/num4', function(req, res){
-  res.sendFile(__dirname + '/assets/num_button_4.png');
-});
-
-
 io.on('connection', function(socket){
 
   //push values
@@ -214,7 +185,7 @@ io.on('connection', function(socket){
       }
       else{ // start  
         for( var i = 0; i < user_socketID[room_num].length; i++){
-          io.to(user_socketID[room_num][i]).emit('start', user_name.length, user_name[room_num][i], user_state[room_num][i], user_num[room_num][i], user_num[room_num].length);
+          io.to(user_socketID[room_num][i]).emit('start', user_name[room_num][i],  user_num[room_num][i], user_state[room_num][i], user_num[room_num].length);
         }
 
       }

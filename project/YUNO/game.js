@@ -1,4 +1,22 @@
 
+//------ getting cookies
+
+  // getCookie
+  var getCookie = function(name) {
+    var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return value? value[2] : null;
+  };
+
+  var user_count = getCookie("CNT");
+  var user_num = getCookie("P_NUM");
+  var room_num = getCookie("R_NUM");
+
+  console.log("user_num : " + user_num);
+  console.log("room_num : " + room_num);
+
+//------
+
+
 var config = {
     type: Phaser.AUTO,
     width: 900,
@@ -133,17 +151,19 @@ var player_num4;
 function create ()
 {
 
-  // this.socket = io();
-  // this.socket.emit('aa', 'aa');
+  game.socket = io();
 
-  // this.socket.on('set_board', function(num){ //3
-
-  //   A(num);
-
-  // });
-
-  this.add.image(450,300,'board2');
-
+  // set board
+  if (user_count == 2){
+    this.add.image(450,300,'board2');
+  }
+  else if (user_count == 3){
+    this.add.image(450,300,'board3');
+    game.socket.emit('aa','aa');
+  }
+  else if (user_count == 4){
+    this.add.image(450,300,'board4');
+  }
 
   //dummy
   total_card = new Array("y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
@@ -156,32 +176,41 @@ function create ()
     "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
     "4_p", "4_p", "4_p", "4_p", "c_c", "c_c","c_c","c_c");
 
-  for(var i=0; i<7; i++)
+  // player set 
+  // user_count = 2  -- player 1 && player 3
+  // user_count = 3  -- player 1 && player 2 && player 3
+  // user_count = 4  -- player 1 && player 2 && player 3 && player 4
+  
+  for(var i=0; i<7; i++) // set player1 card
   {
     var j = parseInt(Math.random()*total_card.length);
     player1.push(total_card[j]);
     total_card.splice(j,1);
   }
 
-  for(var i=0; i<7; i++)
-  {
-    var j = parseInt(Math.random()*total_card.length);
-    player2.push(total_card[j]);
-    total_card.splice(j,1);
+  if (user_count > 2){
+    for(var i=0; i<7; i++) // set player2 card
+    {
+      var j = parseInt(Math.random()*total_card.length);
+      player2.push(total_card[j]);
+      total_card.splice(j,1);
+    }
   }
 
-  for(var i=0; i<7; i++)
+  for(var i=0; i<7; i++) // set player3 card
   {
     var j = parseInt(Math.random()*total_card.length);
     player3.push(total_card[j]);
     total_card.splice(j,1);
   }
 
-  for(var i=0; i<7; i++)
-  {
-    var j = parseInt(Math.random()*total_card.length);
-    player4.push(total_card[j]);
-    total_card.splice(j,1);
+  if (user_count == 4){
+    for(var i=0; i<7; i++) // set player4 card
+    {
+      var j = parseInt(Math.random()*total_card.length);
+      player4.push(total_card[j]);
+      total_card.splice(j,1);
+    }
   }
 
   dummy = this.add.image(500,250,'card_dummy').setInteractive();
@@ -201,10 +230,33 @@ function create ()
   });
 
   //player number
-  player_num1 = this.add.image(112,422,'num_1').setInteractive();
-  player_num2 = this.add.image(800,408,'num_2').setInteractive();
+
+  // num 1 
+  if (user_num == 1){
+    player_num1 = this.add.image(112,422,'num_1').setInteractive();
+  }
+  else if (user_num == 2){
+    player_num1 = this.add.image(112,422,'num_2').setInteractive();
+  }
+  else if (user_num == 3){
+    player_num1 = this.add.image(112,422,'num_3').setInteractive();
+  }
+  else if (user_num == 4){
+    player_num1 = this.add.image(112,422,'num_4').setInteractive();
+  }
+  
+  // num 2
+  if (user_count > 2){
+    player_num2 = this.add.image(800,408,'num_2').setInteractive();
+  }
+
+  // num 3
   player_num3 = this.add.image(613,87,'num_3').setInteractive();
-  player_num4 = this.add.image(98,54,'num_4').setInteractive();
+
+  // num 4
+  if (user_count == 4){
+    player_num4 = this.add.image(98,54,'num_4').setInteractive();
+  }
 
   //yuno_button
   yuno_button = this.add.image(790,528,'yuno_button_on').setInteractive();
@@ -221,19 +273,25 @@ function create ()
   //field_card
   var k = parseInt(Math.random()*total_card.length);
   field_card = this.add.image(380,250,total_card[k]).setInteractive();
+  // field_card.name = k;
   total_card.splice(k,1);
 
   //player card
   sprite1 = this.add.group();
-  sprite2 = this.add.group();
-  sprite3 = this.add.group();
-  sprite4 = this.add.group();
-
   get_card();
 
-  other_card(2);
+  if (user_count > 2){
+    sprite2 = this.add.group();
+    other_card(2);
+  }
+  
+  sprite3 = this.add.group();
   other_card(3);
-  other_card(4);
+
+  if (user_count == 4){
+    sprite4 = this.add.group();
+    other_card(4);
+  }
 
 }
 
@@ -266,7 +324,7 @@ function other_card(num) {
     }
   }
 
-  if(num == 3){
+  else if(num == 3){
     sprite3.clear(this);
 
     for(var i=0; i<player3.length; i++)
@@ -277,7 +335,7 @@ function other_card(num) {
     }
   }
 
-  if(num == 4){
+  else if(num == 4){
     sprite4.clear(this);
 
     for(var i=0; i<player4.length; i++)
