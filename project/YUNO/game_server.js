@@ -22,7 +22,8 @@ var g_user_name = new Array(new Array());
 var g_user_num = new Array(new Array());
 var g_user_state = new Array(new Array());
 var g_user_socketID = new Array(new Array());
-var g_user_cnt = new Array();
+// var g_user_cnt = new Array();
+var g_sort_chk = new Array();
 var g_name;
 var g_num;
 var g_cnt;
@@ -87,7 +88,7 @@ app.post('/',function(req, res){
     g_user_name[room_count].push(g_name);
     g_user_num[room_count].push(g_num);
     g_user_state[room_count].push(g_state);
-    g_user_cnt.push(g_cnt);
+    // g_user_cnt.push(g_cnt);
 
     room_count++;
   }
@@ -108,6 +109,75 @@ app.get('/game.js', function(req, res){ // in game
 
 //----------------------------------------------------------
 
+var ArraySort = function(room_num){
+
+  console.log("sorting..");
+
+  var temp;
+
+  // num sorting
+  for ( var i = 0; i < g_user_name[room_num].length - 1; i++){
+    for ( var j = 0; j < g_user_name[room_num].length - 1- i; j++){
+      if (g_user_num[room_num][j] > g_user_num[room_num][j + 1]){
+          //name change
+          temp = g_user_name[room_num][j];
+          g_user_name[room_num][j] = g_user_name[room_num][j + 1];
+          g_user_name[room_num][j + 1] = temp;
+
+          //num change 
+          temp = g_user_num[room_num][j];
+          g_user_num[room_num][j] = g_user_num[room_num][j + 1];
+          g_user_num[room_num][j + 1] = temp;
+
+          //state change
+          temp = g_user_state[room_num][j];
+          g_user_state[room_num][j] = g_user_state[room_num][j + 1];
+          g_user_state[room_num][j + 1] = temp;
+
+          //socket change
+          temp = g_user_socketID[room_num][j];
+          g_user_socketID[room_num][j] = g_user_socketID[room_num][j + 1];
+          g_user_socketID[room_num][j + 1] = temp;
+      }
+    }
+  }
+
+  //host change the position to index 0
+
+  for ( var i = 0; i < g_user_name[room_num].length; i++){
+    if(g_user_state[room_num][i] == "host"){
+      if(i == 0){
+        break;
+      }
+        
+      //name change
+      temp = g_user_name[room_num][0];
+      g_user_name[room_num][0] = g_user_name[room_num][i];
+      g_user_name[room_num][i] = temp;
+
+      //num change 
+      temp = g_user_num[room_num][0];
+      g_user_num[room_num][0] = g_user_num[room_num][i];
+      g_user_num[room_num][i] = temp;
+
+      //state change
+      temp = g_user_state[room_num][0];
+      g_user_state[room_num][0] = g_user_state[room_num][i];
+      g_user_state[room_num][i] = temp;
+
+      //socket change
+      temp = g_user_socketID[room_num][0];
+      g_user_socketID[room_num][0] = g_user_socketID[room_num][i];
+      g_user_socketID[room_num][i] = temp;
+
+      break;
+    }
+  }
+  
+  //check
+  g_sort_chk.push(1);
+}
+
 io.on('connection', function(socket){
 
   console.log("length :" + g_user_name[io_room_count].length);
@@ -117,11 +187,12 @@ io.on('connection', function(socket){
   //push values 
   if(Array.isArray(g_user_socketID[room_count - 1])){
     g_user_socketID[room_count - 1].push(socket.id);
+    
+    if(g_user_socketID[room_count - 1].length == g_cnt)
+    {
+      ArraySort(room_count - 1); // Arrays sorting 
+    }
   }
-
-  // var g_room_num = room_count;
-
-  // io.to(socket.id).emit('set_board', g_user_name[g_room_num].length);
 
   console.log('user connected: ', socket.id);
   console.log(g_user_num);
@@ -129,13 +200,21 @@ io.on('connection', function(socket){
   console.log(g_user_state);
   console.log(g_user_socketID);
 
-  socket.on('aa', function(aa){
-    console.log(aa);
+  socket.on('get_player_nums', function(r_num){
+
+    if(g_sort_chk[r_num] == 1){ // only after sort
+      var arr = new Array();
+
+      for(var i = 0; i < g_user_num[r_num].length; i++){
+        arr.push(g_user_num[r_num][i]);
+      }
+
+      for(var i = 0; i < g_user_socketID[r_num].length; i++){
+        io.to(g_user_socketID[r_num][i]).emit('set_player_nums', arr);
+      }
+    }
+
   });
-
-
-
-
 
 
   // ---------------- del

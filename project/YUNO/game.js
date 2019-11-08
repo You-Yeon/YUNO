@@ -150,6 +150,7 @@ var player_num4;
 
 function create ()
 {
+  var _this = this;
 
   game.socket = io();
 
@@ -180,7 +181,7 @@ function create ()
   // user_count = 2  -- player 1 && player 3
   // user_count = 3  -- player 1 && player 2 && player 3
   // user_count = 4  -- player 1 && player 2 && player 3 && player 4
-  
+
   for(var i=0; i<7; i++) // set player1 card
   {
     var j = parseInt(Math.random()*total_card.length);
@@ -231,32 +232,185 @@ function create ()
 
   //player number
 
-  // num 1 
-  if (user_num == 1){
-    player_num1 = this.add.image(112,422,'num_1').setInteractive();
-  }
-  else if (user_num == 2){
-    player_num1 = this.add.image(112,422,'num_2').setInteractive();
-  }
-  else if (user_num == 3){
-    player_num1 = this.add.image(112,422,'num_3').setInteractive();
-  }
-  else if (user_num == 4){
-    player_num1 = this.add.image(112,422,'num_4').setInteractive();
-  }
+  // get player nums
+
+  var player1_num_img = 'num_1';
+  var player2_num_img = 'num_2';
+  var player3_num_img = 'num_3';
+  var player4_num_img = 'num_4';
   
-  // num 2
-  if (user_count > 2){
-    player_num2 = this.add.image(800,408,'num_2').setInteractive();
-  }
+  game.socket.emit('get_player_nums',room_num);
 
-  // num 3
-  player_num3 = this.add.image(613,87,'num_3').setInteractive();
+  game.socket.on('set_player_nums', function(player_arr){
 
-  // num 4
-  if (user_count == 4){
-    player_num4 = this.add.image(98,54,'num_4').setInteractive();
-  }
+    console.log('set_player_nums');
+    console.log('player_arr : '+player_arr);
+
+    // --- setting player1 (user)
+    if (user_num == 1){
+      player1_num_img = 'num_1';
+    }
+    else if (user_num == 2){
+      player1_num_img = 'num_2';
+    }
+    else if (user_num == 3){
+      player1_num_img = 'num_3';
+    }
+    else if (user_num == 4){
+      player1_num_img = 'num_4';
+    }
+
+    // --- other user
+
+    //find index
+    var index = player_arr.indexOf(user_num);
+
+    // 1 vs 1
+    if(user_count == 2){
+      index += 1;
+      
+      if(index == 2){
+        index = 0;
+      }
+
+      if(player_arr[index] == '1'){
+        player3_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player3_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player3_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player3_num_img = 'num_4';
+      }
+    }
+
+    // 1 vs 1 vs 1
+    if(user_count == 3){
+      index += 1;
+      
+      if(index == 3){
+        index = 0;
+      }
+      
+      if(player_arr[index] == '1'){
+        player2_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player2_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player2_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player2_num_img = 'num_4';
+      }
+
+      // -----
+
+      index += 1;
+      
+      if(index == 3){
+        index = 0;
+      }
+      
+      if(player_arr[index] == '1'){
+        player3_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player3_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player3_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player3_num_img = 'num_4';
+      }
+
+    }
+
+    // 1 vs 1 vs 1 vs 1
+    if(user_count == 4){
+      index += 1;
+      
+      if(index == 4){
+        index = 0;
+      }
+      
+      if(player_arr[index] == '1'){
+        player2_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player2_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player2_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player2_num_img = 'num_4';
+      }
+
+      // -----
+
+      index += 1;
+      
+      if(index == 4){
+        index = 0;
+      }
+      
+      if(player_arr[index] == '1'){
+        player3_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player3_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player3_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player3_num_img = 'num_4';
+      }
+      // -----
+
+      index += 1;
+      
+      if(index == 4){
+        index = 0;
+      }
+      
+      if(player_arr[index] == '1'){
+        player4_num_img = 'num_1';
+      }
+      else if(player_arr[index] == '2'){
+        player4_num_img = 'num_2';
+      }
+      else if(player_arr[index] == '3'){
+        player4_num_img = 'num_3';
+      }
+      else if(player_arr[index] == '4'){
+        player4_num_img = 'num_4';
+      }
+    }
+
+    // num 1 
+    player_num1 = _this.add.image(112,422,player1_num_img).setInteractive();
+        
+    // num 2
+    if (user_count > 2){
+      player_num2 = _this.add.image(800,408,player2_num_img).setInteractive();
+    }
+        
+    // num 3
+    player_num3 = _this.add.image(613,87,player3_num_img).setInteractive();
+        
+    // num 4
+    if (user_count == 4){
+      player_num4 = _this.add.image(98,54,player4_num_img).setInteractive();
+    }
+
+  });
 
   //yuno_button
   yuno_button = this.add.image(790,528,'yuno_button_on').setInteractive();
@@ -294,6 +448,7 @@ function create ()
   }
 
 }
+
 
 function yuno_effect(){
   player_num1.setTexture('num_1');
@@ -497,13 +652,6 @@ function get_card(){
 }
 
 
-function update()
-{
-  // if(sprite1.x > 100){
-  //     sprite1.x -=1;
-  // }
-  // if(sprite1.y > 100){
-  //     sprite1.y -=1;
-  // }
+function update(){
 
 }
