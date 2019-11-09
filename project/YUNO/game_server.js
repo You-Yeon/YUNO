@@ -18,12 +18,20 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser());
 
+// user infos
 var g_user_name = new Array(new Array());
 var g_user_num = new Array(new Array());
 var g_user_state = new Array(new Array());
 var g_user_socketID = new Array(new Array());
-// var g_user_cnt = new Array();
+
 var g_sort_chk = new Array();
+
+// game infos
+var g_player_cards = new Array(new Array());
+var g_dummy_cards = new Array(new Array());
+var g_field_card = new Array(new Array());
+var g_bomb_cnt = new Array();
+
 var g_name;
 var g_num;
 var g_cnt;
@@ -65,10 +73,16 @@ app.post('/',function(req, res){
   // make array
   if(g_user_name[room_count] === undefined){
 
+    // user infos
     g_user_name[room_count] = new Array();
     g_user_num[room_count] = new Array();
     g_user_state[room_count] = new Array();
     g_user_socketID[room_count] = new Array();
+
+    // game infos
+    g_player_cards[room_count] = new Array();
+    g_dummy_cards[room_count] = new Array();
+    g_field_card[room_count] = new Array();
   }
 
   // set cookie
@@ -108,6 +122,45 @@ app.get('/game.js', function(req, res){ // in game
 });
 
 //----------------------------------------------------------
+
+var Shuffle_cards = function(room_num, user_count){
+
+  var temp = new Array();
+  var k;
+  
+  //dummy cards
+  g_dummy_cards[room_num].push("y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
+  "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
+  "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
+  "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
+  "g0", "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
+  "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
+  "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
+  "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
+  "4_p", "4_p", "4_p", "4_p", "c_c", "c_c","c_c","c_c");
+
+  // player cards
+  for(var i = 0; i < user_count; i++){
+    for(var j = 0; j < 7; j++)
+    {
+      k = parseInt(Math.random()*g_dummy_cards[room_num].length);
+      temp.push(g_dummy_cards[room_num][k]);
+      g_dummy_cards[room_num].splice(k,1);
+    }
+    g_player_cards[room_num].push(temp.join('/'));
+    console.log("temp : "+ temp);
+    temp = new Array();
+  }
+
+  //field card
+  k = parseInt(Math.random()*g_dummy_cards[room_num].length);
+  g_field_card[room_num].push(g_dummy_cards[room_num][k]);
+  g_dummy_cards[room_num].splice(k,1);
+
+  console.log("g_dummy_cards : "+ g_dummy_cards);
+  console.log("g_player_cards : "+ g_player_cards);
+  console.log("g_field_card : "+ g_field_card);
+}
 
 var ArraySort = function(room_num){
 
@@ -190,7 +243,12 @@ io.on('connection', function(socket){
     
     if(g_user_socketID[room_count - 1].length == g_cnt)
     {
+      Shuffle_cards(room_count - 1, g_cnt); //Shuffle_cards
       ArraySort(room_count - 1); // Arrays sorting 
+
+      for(var i = 0; i < g_cnt; i++){
+        io.to(g_user_socketID[room_count - 1][i]).emit('start');
+      }
     }
   }
 
@@ -200,7 +258,7 @@ io.on('connection', function(socket){
   console.log(g_user_state);
   console.log(g_user_socketID);
 
-  socket.on('get_player_nums', function(r_num){
+  socket.on('get_player_nums', function(r_num, u_num){
 
     if(g_sort_chk[r_num] == 1){ // only after sort
       var arr = new Array();
@@ -209,9 +267,106 @@ io.on('connection', function(socket){
         arr.push(g_user_num[r_num][i]);
       }
 
-      for(var i = 0; i < g_user_socketID[r_num].length; i++){
-        io.to(g_user_socketID[r_num][i]).emit('set_player_nums', arr);
-      }
+      var index = g_user_num[r_num].indexOf(u_num);
+      io.to(g_user_socketID[r_num][index]).emit('set_player_nums', arr);
+    }
+
+  });
+
+  socket.on('pointerup_dummy', function(r_num, u_num){
+
+    var k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+    var index = g_user_num[r_num].indexOf(u_num);
+    var temp = g_player_cards[r_num][index].split('/');
+
+    temp.push(g_dummy_cards[r_num][k]);
+    g_player_cards[r_num][index] =temp.join('/');
+    g_dummy_cards[r_num].splice(k,1);
+
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('refresh');
+    }
+  });
+
+  socket.on('get_dummy_length', function(r_num, u_num){
+    
+    var index = g_user_num[r_num].indexOf(u_num);
+    io.to(g_user_socketID[r_num][index]).emit('set_dummy', g_dummy_cards[r_num].length);
+
+  });
+
+  socket.on('get_field_card', function(r_num){
+
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1]);
+    }
+
+  });
+
+  socket.on('get_player_info', function(r_num, u_num){
+
+    var index = g_user_num[r_num].indexOf(u_num);
+    var temp = g_player_cards[r_num][index].split('/');
+    
+    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp);
+
+  });
+
+  socket.on('get_other_player_info', function(r_num, u_num, move){
+
+    var index = g_user_num[r_num].indexOf(u_num);
+    index_m = parseInt((index + move) % g_user_num[r_num].length); // 0 ~ g_user_num[r_num].length - 1
+
+    console.log("g_user_num[r_num] :" + g_user_num[r_num]);
+    console.log("index :"+ index);
+    console.log("move :"+ move);
+    console.log("index_m :" + index_m);
+    var temp = g_player_cards[r_num][index_m].split('/');
+    
+    if(move == 1){ // sprite2
+      io.to(g_user_socketID[r_num][index]).emit('set_other_player_info2', temp);
+    }
+    else if(move == 2){ // sprite3
+      io.to(g_user_socketID[r_num][index]).emit('set_other_player_info3', temp);
+    }
+    else if(move == 3){ // sprite4
+      io.to(g_user_socketID[r_num][index]).emit('set_other_player_info4', temp);
+    }
+
+  });
+
+  
+  socket.on('get_other_player_info3', function(r_num, u_num, move){
+
+    var index = g_user_num[r_num].indexOf(u_num);
+    index_m = parseInt((index + move) % g_user_num[r_num].length); // 0 ~ g_user_num[r_num].length - 1
+
+    console.log("g_user_num[r_num] :" + g_user_num[r_num]);
+    console.log("index :"+ index);
+    console.log("move :"+ move);
+    console.log("index_m :" + index_m);
+    var temp = g_player_cards[r_num][index_m].split('/');
+    
+    io.to(g_user_socketID[r_num][index]).emit('set_other_player_info3', temp);
+
+  });
+
+  socket.on('play_a_card', function(r_num, u_num, _index){
+
+    var index = g_user_num[r_num].indexOf(u_num);
+    var temp = g_player_cards[r_num][index].split('/');
+
+    if(temp[_index]){ // When matching
+      console.log("match");
+      console.log("temp[_index] :" + temp[_index]);
+      g_field_card[r_num].push(temp[_index]);
+      temp.splice(_index,1);
+      g_player_cards[r_num][index] = temp.join('/');
+
+    }
+
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('refresh');
     }
 
   });

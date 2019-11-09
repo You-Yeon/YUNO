@@ -129,11 +129,7 @@ function preload ()
 
 }
 
-var player1 = new Array();
-var player2 = new Array();
-var player3 = new Array();
-var player4 = new Array();
-
+var sprite;
 var sprite1;
 var sprite2;
 var sprite3;
@@ -148,103 +144,130 @@ var player_num2;
 var player_num3;
 var player_num4;
 
+var player1_num_img = 'num_1';
+var player2_num_img = 'num_2';
+var player3_num_img = 'num_3';
+var player4_num_img = 'num_4';
+
 function create ()
 {
-  var _this = this;
-
-  game.socket = io();
-
-  // set board
-  if (user_count == 2){
-    this.add.image(450,300,'board2');
-  }
-  else if (user_count == 3){
-    this.add.image(450,300,'board3');
-    game.socket.emit('aa','aa');
-  }
-  else if (user_count == 4){
-    this.add.image(450,300,'board4');
-  }
-
-  //dummy
-  total_card = new Array("y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
-    "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
-    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
-    "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
-    "g0", "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
-    "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
-    "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
-    "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
-    "4_p", "4_p", "4_p", "4_p", "c_c", "c_c","c_c","c_c");
-
-  // player set 
+  // players setting..
   // user_count = 2  -- player 1 && player 3
   // user_count = 3  -- player 1 && player 2 && player 3
   // user_count = 4  -- player 1 && player 2 && player 3 && player 4
 
-  for(var i=0; i<7; i++) // set player1 card
-  {
-    var j = parseInt(Math.random()*total_card.length);
-    player1.push(total_card[j]);
-    total_card.splice(j,1);
-  }
+  var _this = this;
+  game.socket = io();
 
-  if (user_count > 2){
-    for(var i=0; i<7; i++) // set player2 card
-    {
-      var j = parseInt(Math.random()*total_card.length);
-      player2.push(total_card[j]);
-      total_card.splice(j,1);
+  // ----- start
+  game.socket.on('start', function(){
+
+    // ----- set board
+    if (user_count == 2){
+      _this.add.image(450,300,'board2');
     }
-  }
-
-  for(var i=0; i<7; i++) // set player3 card
-  {
-    var j = parseInt(Math.random()*total_card.length);
-    player3.push(total_card[j]);
-    total_card.splice(j,1);
-  }
-
-  if (user_count == 4){
-    for(var i=0; i<7; i++) // set player4 card
-    {
-      var j = parseInt(Math.random()*total_card.length);
-      player4.push(total_card[j]);
-      total_card.splice(j,1);
+    else if (user_count == 3){
+      _this.add.image(450,300,'board3');
     }
-  }
+    else if (user_count == 4){
+      _this.add.image(450,300,'board4');
+    }
 
-  dummy = this.add.image(500,250,'card_dummy').setInteractive();
-  dummy.inputEnabled = true;
+    // game.socket.emit('aa','aa');
 
-  dummy.on('pointerup', function(pointer){
-    if(total_card.length>0){
-      var temp = parseInt(Math.random()*total_card.length);
-      player1.push(total_card[temp]);
-      total_card.splice(temp,1);
-      get_card();
+    // ----- set cards
 
-      if(total_card.length==0){
-        dummy.destroy(this);
+    // dummy cards
+    dummy = _this.add.sprite(500,250,'card_dummy').setInteractive();
+    dummy.inputEnabled = true;
+
+    dummy.on('pointerup', function(pointer){
+
+      // ----- get dummy length
+      game.socket.emit('get_dummy_length',room_num, user_num);
+
+    });
+
+    // ----- set player nums
+    game.socket.on('set_dummy', function(length){
+
+      if(length > 0){
+        console.log("click");
+        game.socket.emit('pointerup_dummy',room_num, user_num);
       }
+      else{
+        dummy.destroy();
+      }
+
+    });
+
+    //player cards
+    sprite1 = _this.add.group();
+
+    if (user_count > 2){
+      sprite2 = _this.add.group();
     }
+      
+    sprite3 = _this.add.group();
+    
+    if (user_count == 4){
+      sprite4 = _this.add.group();
+    }
+
+    //----- player_cards
+
+    // player1
+    get_card(_this);
+    
+    // player2
+    if (user_count > 2){
+      other_card(_this,2);
+    }
+
+    // player3
+    other_card(_this,3);
+    
+    // plyer 4
+    if (user_count == 4){
+      other_card(_this,4);
+    }
+
+    //----- field_card
+
+    // get_field_card
+    game.socket.emit('get_field_card',room_num);
+
+    // set_field_card
+    game.socket.on('set_field_card', function(_field_card){
+      field_card = _this.add.image(380,250,_field_card).setInteractive();
+    });
+
+    // ----- get player nums
+    game.socket.emit('get_player_nums',room_num,user_num);
+
+    // ----- yuno_button
+    yuno_button = _this.add.image(790,528,'yuno_button_on').setInteractive();
+    yuno_button.inputEnabled = true;
+    yuno_button.on('pointerup', function(pointer){
+      yuno_button.setTexture('yuno_button_on');
+      player_num1.setTexture('num_1');
+    });
+    yuno_button.on('pointerdown', function(pointer){
+      yuno_button.setTexture('yuno_button_off');
+      player_num1.setTexture('num_yuno');
+    });
+
   });
 
-  //player number
+  // ----- refresh
+  game.socket.on('refresh', function(){
+    refresh_cards(_this);
+  });
 
-  // get player nums
-
-  var player1_num_img = 'num_1';
-  var player2_num_img = 'num_2';
-  var player3_num_img = 'num_3';
-  var player4_num_img = 'num_4';
-  
-  game.socket.emit('get_player_nums',room_num);
-
+  // ----- set_player_nums
   game.socket.on('set_player_nums', function(player_arr){
 
     console.log('set_player_nums');
-    console.log('player_arr : '+player_arr);
 
     // --- setting player1 (user)
     if (user_num == 1){
@@ -412,41 +435,215 @@ function create ()
 
   });
 
-  //yuno_button
-  yuno_button = this.add.image(790,528,'yuno_button_on').setInteractive();
-  yuno_button.inputEnabled = true;
-  yuno_button.on('pointerup', function(pointer){
-    yuno_button.setTexture('yuno_button_on');
-    player_num1.setTexture('num_1');
-  });
-  yuno_button.on('pointerdown', function(pointer){
-    yuno_button.setTexture('yuno_button_off');
-    player_num1.setTexture('num_yuno');
-  });
+  // ----- set_player_info
+  game.socket.on('set_player_info', function(player_arr){
 
-  //field_card
-  var k = parseInt(Math.random()*total_card.length);
-  field_card = this.add.image(380,250,total_card[k]).setInteractive();
-  // field_card.name = k;
-  total_card.splice(k,1);
-
-  //player card
-  sprite1 = this.add.group();
-  get_card();
-
-  if (user_count > 2){
-    sprite2 = this.add.group();
-    other_card(2);
-  }
+    sprite1.destroy();
+    sprite1 = _this.add.group();
+    
+    console.log("set_player_info");
+    console.log("player_arr :" + player_arr);
   
-  sprite3 = this.add.group();
-  other_card(3);
+    if(player_arr.length == 0){
+      sprite1.destroy();
+    }
+    else if(player_arr.length < 20){
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        sprite = sprite1.create(205+i*25,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){
+          sprite1.clear(_this);
+          
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+    else if(player_arr.length < 27){
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite1.create(205+i*18,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){ 
+          sprite1.clear(_this);
 
-  if (user_count == 4){
-    sprite4 = this.add.group();
-    other_card(4);
-  }
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+  
+    else if(player_arr.length < 34){
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite1.create(205+i*14,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){ 
+          sprite1.clear(_this);
 
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+  
+    else if(player_arr.length < 47){
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite1.create(205+i*10,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){ 
+          sprite1.clear(_this);
+
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+  
+    else if(player_arr.length < 77){
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite1.create(205+i*6,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){ 
+          sprite1.clear(_this);
+
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+  
+    else{
+  
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite1.create(205+i*4,475,player_arr[i]).setInteractive();
+        sprite.name = i;
+        sprite.inputEnabled = true;
+        sprite.on('pointerover', function(event){
+          this.y -=70;
+        });
+        sprite.on('pointerout', function(event){
+          this.y +=70;
+        });
+        sprite.on('pointerup', function(pointer){ 
+          sprite1.clear(_this);
+          
+          // ----- play a card
+          game.socket.emit('play_a_card',room_num, user_num, this.name);
+          field_card.setTexture(player_arr[this.name]);
+  
+        });
+  
+      }
+  
+    }
+  
+  });
+
+  // ----- set_other_player_info2
+  game.socket.on('set_other_player_info2', function(player_arr){
+
+        for(var i=0; i<player_arr.length; i++)
+        {
+          var sprite = sprite2.create(815,340-i*20,'other_card')
+          sprite.angle += 270;
+          sprite.name = i;
+        }
+  
+  });
+
+  // ----- set_other_player_info3
+  game.socket.on('set_other_player_info3', function(player_arr){
+
+        for(var i=0; i<player_arr.length; i++)
+        {
+          var sprite = sprite3.create(547-i*20,73,'other_card')
+          sprite.angle += 180;
+          sprite.name = i;
+        }
+  
+  });
+
+  // ----- set_other_player_info4
+  game.socket.on('set_other_player_info4', function(player_arr){
+
+      for(var i=0; i<player_arr.length; i++)
+      {
+        var sprite = sprite4.create(85,334-i*20,'other_card')
+        sprite.angle += 90;
+        sprite.name = i;
+      }
+
+  });
+
+  // ----- set_field_card
+  game.socket.on('set_field_card', function(_field_card){
+    field_card = _this.add.image(380,250,_field_card).setInteractive();
+  });
 }
 
 
@@ -454,203 +651,74 @@ function yuno_effect(){
   player_num1.setTexture('num_1');
 }
 
-function A(num){
-  if(num == 2){
-    game.add.image(450,300,'board2');
-  }
-  else if(num == 3){
-    game.add.image(450,300,'board3');
-  }
-  else if(num == 4){
-    game.add.image(450,300,'board4');
-  }
-}
-
-function other_card(num) {
+function other_card(_this,num) {
 
   if(num == 2){
-    sprite2.clear(this);
+    sprite2.clear(_this);
 
-    for(var i=0; i<player2.length; i++)
-    {
-      var sprite = sprite2.create(815,340-i*20,'other_card');
-      sprite.angle += 270;
-      sprite.name = i;
-    }
+    // ----- get_other_player_info
+    game.socket.emit('get_other_player_info',room_num, user_num, 1);
+
   }
 
   else if(num == 3){
-    sprite3.clear(this);
+    sprite3.clear(_this);
 
-    for(var i=0; i<player3.length; i++)
-    {
-      var sprite = sprite3.create(547-i*20,73,'other_card');
-      sprite.angle += 180;
-      sprite.name = i;
+    // ----- get_other_player_info
+    if(user_count > 2){ // user_count == 3 || 4
+      game.socket.emit('get_other_player_info3',room_num, user_num, 2);
     }
+    else{ // user_count == 2
+      game.socket.emit('get_other_player_info3',room_num, user_num, 1);
+    }
+
   }
 
   else if(num == 4){
-    sprite4.clear(this);
+    sprite4.clear(_this);
 
-    for(var i=0; i<player4.length; i++)
-    {
-      var sprite = sprite4.create(85,334-i*20,'other_card');
-      sprite.angle += 90;
-      sprite.name = i;
-    }
+    // ----- get_other_player_info
+    game.socket.emit('get_other_player_info',room_num, user_num, 3);
+
   }
 }
 
-function get_card(){
-
-  sprite1.clear(this);
-
-  if(player1.length < 20){
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*25,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
-  else if(player1.length < 27){
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*18,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
-
-  else if(player1.length < 34){
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*14,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
-
-  else if(player1.length < 47){
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*10,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
-
-  else if(player1.length < 77){
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*6,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
-
-  else{
-
-    for(var i=0; i<player1.length; i++)
-    {
-      var sprite = sprite1.create(205+i*4,475,player1[i]).setInteractive();
-      sprite.name = i;
-      sprite.inputEnabled = true;
-      sprite.on('pointerover', function(event){
-        this.y -=70;
-      });
-      sprite.on('pointerout', function(event){
-        this.y +=70;
-      });
-      sprite.on('pointerup', function(pointer){
-        sprite1.clear(this);
-        field_card.setTexture(player1[this.name]);
-        player1.splice(this.name,1);
-        get_card();
-      });
-
-    }
-
-  }
+function get_card(_this){
+  console.log("get_card");
+  
+  // ----- get_player_info
+  game.socket.emit('get_player_info',room_num, user_num);
 
 }
 
+function refresh_cards(_this){
+  console.log("refresh_cards");
+
+  //----- player_cards
+
+  // player1
+  get_card(_this);
+  
+  // player2
+  if (user_count > 2){
+    other_card(_this,2);
+  }
+
+  // player3
+  other_card(_this,3);
+  
+  // plyer 4
+  if (user_count == 4){
+    other_card(_this,4);
+  }
+
+  // field_card
+
+  // ----- get_field_card
+  game.socket.emit('get_field_card',room_num);
+
+  field_card.destroy();
+}
 
 function update(){
 
