@@ -24,12 +24,12 @@ var g_user_num = new Array(new Array());
 var g_user_state = new Array(new Array());
 var g_user_socketID = new Array(new Array());
 
-var g_sort_chk = new Array();
-
 // game infos
 var g_player_cards = new Array(new Array());
 var g_dummy_cards = new Array(new Array());
 var g_field_card = new Array(new Array());
+var g_turn_is = new Array(); // who turn?
+var g_direction_is = new Array(); // what direction?
 var g_bomb_cnt = new Array();
 
 var g_name;
@@ -152,7 +152,7 @@ var Shuffle_cards = function(room_num, user_count){
     temp = new Array();
   }
 
-  //field card
+  // field card
   k = parseInt(Math.random()*g_dummy_cards[room_num].length);
   g_field_card[room_num].push(g_dummy_cards[room_num][k]);
   g_dummy_cards[room_num].splice(k,1);
@@ -160,6 +160,7 @@ var Shuffle_cards = function(room_num, user_count){
   console.log("g_dummy_cards : "+ g_dummy_cards);
   console.log("g_player_cards : "+ g_player_cards);
   console.log("g_field_card : "+ g_field_card);
+ 
 }
 
 var ArraySort = function(room_num){
@@ -167,6 +168,7 @@ var ArraySort = function(room_num){
   console.log("sorting..");
 
   var temp;
+  var index;
 
   // num sorting
   for ( var i = 0; i < g_user_name[room_num].length - 1; i++){
@@ -227,8 +229,15 @@ var ArraySort = function(room_num){
     }
   }
   
-  //check
-  g_sort_chk.push(1);
+  // setting turn
+  index = g_user_state[room_num].indexOf("host");
+  g_turn_is.push(g_user_num[room_num][index]);
+  console.log("g_turn_is :" + g_turn_is);
+
+  // setting direction
+  g_direction_is.push(0); // 0 : 반시계, 1 : 시계
+  console.log("g_direction_is : " + g_direction_is);
+
 }
 
 io.on('connection', function(socket){
@@ -249,7 +258,7 @@ io.on('connection', function(socket){
       for(var i = 0; i < g_cnt; i++){
         io.to(g_user_socketID[room_count - 1][i]).emit('start');
       }
-    }
+    }   
   }
 
   console.log('user connected: ', socket.id);
@@ -258,18 +267,18 @@ io.on('connection', function(socket){
   console.log(g_user_state);
   console.log(g_user_socketID);
 
-  socket.on('get_player_nums', function(r_num, u_num){
+  socket.on('get_player_nums', function(r_num, u_num, _num){
 
-    if(g_sort_chk[r_num] == 1){ // only after sort
-      var arr = new Array();
+    var arr = new Array();
+    var turn = g_turn_is[r_num];
+    var dir = g_direction_is[r_num];
 
-      for(var i = 0; i < g_user_num[r_num].length; i++){
-        arr.push(g_user_num[r_num][i]);
-      }
-
-      var index = g_user_num[r_num].indexOf(u_num);
-      io.to(g_user_socketID[r_num][index]).emit('set_player_nums', arr);
+    for(var i = 0; i < g_user_num[r_num].length; i++){
+      arr.push(g_user_num[r_num][i]);
     }
+
+    var index = g_user_num[r_num].indexOf(u_num);
+    io.to(g_user_socketID[r_num][index]).emit('set_player_nums', arr, turn, dir, _num);
 
   });
 
@@ -283,22 +292,55 @@ io.on('connection', function(socket){
     g_player_cards[r_num][index] =temp.join('/');
     g_dummy_cards[r_num].splice(k,1);
 
+    // turn setting
+    var direction;
+    
+    // --- setting direction
+    if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
+      direction = 1;
+    }
+    else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
+      direction = -1;
+    }
+          
+    // --- find index
+    index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
+    index += direction;
+    
+    if(index == g_user_num[r_num].length){
+      index = 0;
+    }
+    else if(index == -1){
+      index = g_user_num[r_num].length - 1;
+    }
+    
+    g_turn_is[r_num] = g_user_num[r_num][index];
+
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       io.to(g_user_socketID[r_num][i]).emit('refresh');
     }
+
   });
 
-  socket.on('get_dummy_length', function(r_num, u_num){
+  socket.on('get_dummy_length', function(r_num, u_num, num){
     
+    // num == 1 : get dummy card
+    // num == 2 : refresh dummy
     var index = g_user_num[r_num].indexOf(u_num);
-    io.to(g_user_socketID[r_num][index]).emit('set_dummy', g_dummy_cards[r_num].length);
+    
+    if(num == 1){
+      io.to(g_user_socketID[r_num][index]).emit('set_dummy1', g_dummy_cards[r_num].length);
+    }
+    else if(num == 2){
+      io.to(g_user_socketID[r_num][index]).emit('set_dummy2', g_dummy_cards[r_num].length);
+    }
 
   });
 
-  socket.on('get_field_card', function(r_num){
+  socket.on('get_field_card', function(r_num, _num){
 
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
-      io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1]);
+      io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1], _num);
     }
 
   });
@@ -307,8 +349,9 @@ io.on('connection', function(socket){
 
     var index = g_user_num[r_num].indexOf(u_num);
     var temp = g_player_cards[r_num][index].split('/');
+    var turn = g_turn_is[r_num];
     
-    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp);
+    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, turn);
 
   });
 
@@ -334,7 +377,6 @@ io.on('connection', function(socket){
     }
 
   });
-
   
   socket.on('get_other_player_info3', function(r_num, u_num, move){
 
@@ -353,16 +395,44 @@ io.on('connection', function(socket){
 
   socket.on('play_a_card', function(r_num, u_num, _index){
 
+    console.log("r_num :" +  r_num);
+    console.log("u_num :" + u_num);
     var index = g_user_num[r_num].indexOf(u_num);
     var temp = g_player_cards[r_num][index].split('/');
 
     if(temp[_index]){ // When matching
       console.log("match");
       console.log("temp[_index] :" + temp[_index]);
+      
+      // get card and push the field card
       g_field_card[r_num].push(temp[_index]);
       temp.splice(_index,1);
       g_player_cards[r_num][index] = temp.join('/');
 
+      // turn setting
+      var direction;
+      var index;
+
+      // --- setting direction
+      if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
+        direction = 1;
+      }
+      else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
+        direction = -1;
+      }
+      
+      // --- find index
+      index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
+      index += direction;
+
+      if(index == g_user_num[r_num].length){
+        index = 0;
+      }
+      else if(index == -1){
+        index = g_user_num[r_num].length - 1;
+      }
+
+      g_turn_is[r_num] = g_user_num[r_num][index];
     }
 
     for(var i = 0; i < g_user_socketID[r_num].length; i++){

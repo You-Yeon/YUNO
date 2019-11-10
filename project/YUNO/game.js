@@ -111,6 +111,7 @@ function preload ()
     this.load.image('num_yuno', '/assets/yuno_num_button');
 
     this.load.image('other_card', '/assets/other_back_card');
+    this.load.image('p_other_card', '/assets/p_other_back_card');
 
     this.load.image('f_num_1', '/assets/focus_num_button_1');
     this.load.image('f_num_2', '/assets/focus_num_button_2');
@@ -119,10 +120,10 @@ function preload ()
     this.load.image('f_num_yuno', '/assets/focus_yuno_num_button');
 
     this.load.image('choose_color_board', '/assets/choose_color_board');
-    this.load.image('red_color_card', '/assets/red_color_card');
-    this.load.image('blue_color_card', '/assets/blue_color_card');
-    this.load.image('yellow_color_card', '/assets/yellow_color_card');
-    this.load.image('green_color_card', '/assets/green_color_card');
+    this.load.image('r_color_card', '/assets/red_color_card');
+    this.load.image('b_color_card', '/assets/blue_color_card');
+    this.load.image('y_color_card', '/assets/yellow_color_card');
+    this.load.image('g_color_card', '/assets/green_color_card');
 
     this.load.image('r_direction', '/assets/direction');
     this.load.image('l_direction', '/assets/direction2');
@@ -144,10 +145,10 @@ var player_num2;
 var player_num3;
 var player_num4;
 
-var player1_num_img = 'num_1';
-var player2_num_img = 'num_2';
-var player3_num_img = 'num_3';
-var player4_num_img = 'num_4';
+var player1_num_img;
+var player2_num_img;
+var player3_num_img;
+var player4_num_img;
 
 function create ()
 {
@@ -184,21 +185,7 @@ function create ()
     dummy.on('pointerup', function(pointer){
 
       // ----- get dummy length
-      game.socket.emit('get_dummy_length',room_num, user_num);
-
-    });
-
-    // ----- set player nums
-    game.socket.on('set_dummy', function(length){
-
-      if(length > 0){
-        console.log("click");
-        game.socket.emit('pointerup_dummy',room_num, user_num);
-      }
-      else{
-        dummy.destroy();
-      }
-
+      game.socket.emit('get_dummy_length',room_num, user_num, 1);
     });
 
     //player cards
@@ -235,7 +222,7 @@ function create ()
     //----- field_card
 
     // get_field_card
-    game.socket.emit('get_field_card',room_num);
+    game.socket.emit('get_field_card',room_num, 1);
 
     // set_field_card
     game.socket.on('set_field_card', function(_field_card){
@@ -243,11 +230,12 @@ function create ()
     });
 
     // ----- get player nums
-    game.socket.emit('get_player_nums',room_num,user_num);
+    game.socket.emit('get_player_nums',room_num, user_num, 1);
 
     // ----- yuno_button
     yuno_button = _this.add.image(790,528,'yuno_button_on').setInteractive();
     yuno_button.inputEnabled = true;
+    
     yuno_button.on('pointerup', function(pointer){
       yuno_button.setTexture('yuno_button_on');
       player_num1.setTexture('num_1');
@@ -264,182 +252,404 @@ function create ()
     refresh_cards(_this);
   });
 
+  // ----- get dummy and set dummy
+  game.socket.on('set_dummy1', function(length){
+
+    if(length > 0){
+      if(length == 1){
+        dummy.setTexture('back_card');
+      }
+      game.socket.emit('pointerup_dummy',room_num, user_num);
+    }
+    else{
+      dummy.destroy();
+    }
+  
+  });
+
+  // ----- refresh dummy
+  game.socket.on('set_dummy2', function(length){
+
+    if(length > 0){
+      if(length == 1){
+        dummy.setTexture('back_card');
+      }
+    }
+    else{
+      dummy.destroy();
+    }
+    
+  });
+
   // ----- set_player_nums
-  game.socket.on('set_player_nums', function(player_arr){
+  game.socket.on('set_player_nums', function(player_arr, _turn, _dir, _num){
 
-    console.log('set_player_nums');
+    // num == 1 : create player nums
+    // num == 2 : refresh player nums
+    var direction;
 
-    // --- setting player1 (user)
-    if (user_num == 1){
-      player1_num_img = 'num_1';
-    }
-    else if (user_num == 2){
-      player1_num_img = 'num_2';
-    }
-    else if (user_num == 3){
-      player1_num_img = 'num_3';
-    }
-    else if (user_num == 4){
-      player1_num_img = 'num_4';
-    }
+    console.log("set player nums");
+    console.log("player_arr : "+player_arr);
 
-    // --- other user
+    // --- setting direction
+    if(_dir == 0){ // 반시계 방향 ( + )
+      direction = 1;
+    }
+    else if(_dir == 1){ // 시계 방향 ( - )
+      direction = -1;
+    }
 
     //find index
     var index = player_arr.indexOf(user_num);
 
+    // --- setting player1 (user)
+    if (player_arr[index] == '1'){
+      if (_turn == '1'){
+        player1_num_img = 'f_num_1';
+      }
+      else{
+        player1_num_img = 'num_1';
+      }
+    }
+    else if (player_arr[index] == '2'){
+      if (_turn == '2'){
+        player1_num_img = 'f_num_2';
+      }
+      else{
+        player1_num_img = 'num_2';
+      }
+    }
+    else if (player_arr[index] == '3'){
+      if (_turn == '3'){
+        player1_num_img = 'f_num_3';
+      }
+      else{
+        player1_num_img = 'num_3';
+      }
+    }
+    else if (player_arr[index] == '4'){
+      if (_turn == '4'){
+        player1_num_img = 'f_num_4';
+      }
+      else{
+        player1_num_img = 'num_4';
+      }
+    }
+
+    // --- other user
+
     // 1 vs 1
     if(user_count == 2){
-      index += 1;
+      index += direction;
       
       if(index == 2){
         index = 0;
       }
+      else if(index == -1){
+        index = 2;
+      }
+
 
       if(player_arr[index] == '1'){
-        player3_num_img = 'num_1';
+        if (_turn == '1'){
+          player3_num_img = 'f_num_1';
+        }
+        else{
+          player3_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player3_num_img = 'num_2';
+        if (_turn == '2'){
+          player3_num_img = 'f_num_2';
+        }
+        else{
+          player3_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player3_num_img = 'num_3';
+        if (_turn == '3'){
+          player3_num_img = 'f_num_3';
+        }
+        else{
+          player3_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player3_num_img = 'num_4';
+        if (_turn == '4'){
+          player3_num_img = 'f_num_4';
+        }
+        else{
+          player3_num_img = 'num_4';
+        }
       }
     }
 
     // 1 vs 1 vs 1
     if(user_count == 3){
-      index += 1;
+      index += direction;
       
       if(index == 3){
         index = 0;
       }
+      else if(index == -1){
+        index = 3;
+      }
       
       if(player_arr[index] == '1'){
-        player2_num_img = 'num_1';
+        if (_turn == '1'){
+          player2_num_img = 'f_num_1';
+        }
+        else{
+          player2_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player2_num_img = 'num_2';
+        if (_turn == '2'){
+          player2_num_img = 'f_num_2';
+        }
+        else{
+          player2_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player2_num_img = 'num_3';
+        if (_turn == '3'){
+          player2_num_img = 'f_num_3';
+        }
+        else{
+          player2_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player2_num_img = 'num_4';
+        if (_turn == '4'){
+          player2_num_img = 'f_num_4';
+        }
+        else{
+          player2_num_img = 'num_4';
+        }
       }
 
       // -----
 
-      index += 1;
+      index += direction;
       
       if(index == 3){
         index = 0;
       }
+      else if(index == -1){
+        index = 3;
+      }
       
       if(player_arr[index] == '1'){
-        player3_num_img = 'num_1';
+        if (_turn == '1'){
+          player3_num_img = 'f_num_1';
+        }
+        else{
+          player3_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player3_num_img = 'num_2';
+        if (_turn == '2'){
+          player3_num_img = 'f_num_2';
+        }
+        else{
+          player3_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player3_num_img = 'num_3';
+        if (_turn == '3'){
+          player3_num_img = 'f_num_3';
+        }
+        else{
+          player3_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player3_num_img = 'num_4';
+        if (_turn == '4'){
+          player3_num_img = 'f_num_4';
+        }
+        else{
+          player3_num_img = 'num_4';
+        }
       }
 
     }
 
     // 1 vs 1 vs 1 vs 1
     if(user_count == 4){
-      index += 1;
+      index += direction;
       
       if(index == 4){
         index = 0;
       }
+      else if(index == -1){
+        index = 4;
+      }
       
       if(player_arr[index] == '1'){
-        player2_num_img = 'num_1';
+        if (_turn == '1'){
+          player2_num_img = 'f_num_1';
+        }
+        else{
+          player2_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player2_num_img = 'num_2';
+        if (_turn == '2'){
+          player2_num_img = 'f_num_2';
+        }
+        else{
+          player2_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player2_num_img = 'num_3';
+        if (_turn == '3'){
+          player2_num_img = 'f_num_3';
+        }
+        else{
+          player2_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player2_num_img = 'num_4';
+        if (_turn == '4'){
+          player2_num_img = 'f_num_4';
+        }
+        else{
+          player2_num_img = 'num_4';
+        }
       }
 
       // -----
 
-      index += 1;
+      index += direction;
       
       if(index == 4){
         index = 0;
       }
+      else if(index == -1){
+        index = 4;
+      }
       
       if(player_arr[index] == '1'){
-        player3_num_img = 'num_1';
+        if (_turn == '1'){
+          player3_num_img = 'f_num_1';
+        }
+        else{
+          player3_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player3_num_img = 'num_2';
+        if (_turn == '2'){
+          player3_num_img = 'f_num_2';
+        }
+        else{
+          player3_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player3_num_img = 'num_3';
+        if (_turn == '3'){
+          player3_num_img = 'f_num_3';
+        }
+        else{
+          player3_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player3_num_img = 'num_4';
+        if (_turn == '4'){
+          player3_num_img = 'f_num_4';
+        }
+        else{
+          player3_num_img = 'num_4';
+        }
       }
       // -----
 
-      index += 1;
+      index += direction;
       
       if(index == 4){
         index = 0;
       }
+      else if(index == -1){
+        index = 4;
+      }
       
       if(player_arr[index] == '1'){
-        player4_num_img = 'num_1';
+        if (_turn == '1'){
+          player4_num_img = 'f_num_1';
+        }
+        else{
+          player4_num_img = 'num_1';
+        }
       }
       else if(player_arr[index] == '2'){
-        player4_num_img = 'num_2';
+        if (_turn == '2'){
+          player4_num_img = 'f_num_2';
+        }
+        else{
+          player4_num_img = 'num_2';
+        }
       }
       else if(player_arr[index] == '3'){
-        player4_num_img = 'num_3';
+        if (_turn == '3'){
+          player4_num_img = 'f_num_3';
+        }
+        else{
+          player4_num_img = 'num_3';
+        }
       }
       else if(player_arr[index] == '4'){
-        player4_num_img = 'num_4';
+        if (_turn == '4'){
+          player4_num_img = 'f_num_4';
+        }
+        else{
+          player4_num_img = 'num_4';
+        }
       }
     }
 
-    // num 1 
-    player_num1 = _this.add.image(112,422,player1_num_img).setInteractive();
-        
-    // num 2
-    if (user_count > 2){
-      player_num2 = _this.add.image(800,408,player2_num_img).setInteractive();
+    // create image or refresh image
+    if(_num == 1){
+      // num 1 
+      player_num1 = _this.add.image(112,422,player1_num_img).setInteractive();
+          
+      // num 2
+      if (user_count > 2){
+        player_num2 = _this.add.image(800,408,player2_num_img).setInteractive();
+      }
+          
+      // num 3
+      player_num3 = _this.add.image(613,87,player3_num_img).setInteractive();
+          
+      // num 4
+      if (user_count == 4){
+        player_num4 = _this.add.image(98,54,player4_num_img).setInteractive();
+      }
     }
-        
-    // num 3
-    player_num3 = _this.add.image(613,87,player3_num_img).setInteractive();
-        
-    // num 4
-    if (user_count == 4){
-      player_num4 = _this.add.image(98,54,player4_num_img).setInteractive();
+    else if(_num == 2){
+      // num 1 
+      player_num1.setTexture(player1_num_img);
+          
+      // num 2
+      if (user_count > 2){
+        player_num2.setTexture(player2_num_img);
+      }
+          
+      // num 3
+      player_num3.setTexture(player3_num_img);
+          
+      // num 4
+      if (user_count == 4){
+        player_num4.setTexture(player4_num_img);
+      }
     }
 
   });
 
   // ----- set_player_info
-  game.socket.on('set_player_info', function(player_arr){
+  game.socket.on('set_player_info', function(player_arr, _turn){
 
-    sprite1.destroy();
-    sprite1 = _this.add.group();
+    sprite1.clear(_this);
+    // sprite1.destroy();
+    // sprite1 = _this.add.group();
     
     console.log("set_player_info");
     console.log("player_arr :" + player_arr);
@@ -454,20 +664,23 @@ function create ()
         sprite = sprite1.create(205+i*25,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){
-          sprite1.clear(_this);
-          
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        
+        if(user_num == _turn){ //  when player turn
+          sprite.on('pointerover', function(event){
+            this.y -=70;
+          });
+          sprite.on('pointerout', function(event){
+            this.y +=70;
+          });
+          sprite.on('pointerup', function(pointer){
+            sprite1.clear(_this);
+            
+            // ----- play a card
+            game.socket.emit('play_a_card',room_num, user_num, this.name);
+            field_card.setTexture(player_arr[this.name]);
+    
+          });
+        }
   
       }
   
@@ -479,20 +692,23 @@ function create ()
         var sprite = sprite1.create(205+i*18,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){ 
-          sprite1.clear(_this);
 
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        if(user_num == _turn){ //  when player turn
+          sprite.on('pointerover', function(event){
+            this.y -=70;
+          });
+          sprite.on('pointerout', function(event){
+            this.y +=70;
+          });
+          sprite.on('pointerup', function(pointer){ 
+            sprite1.clear(_this);
+
+            // ----- play a card
+            game.socket.emit('play_a_card',room_num, user_num, this.name);
+            field_card.setTexture(player_arr[this.name]);
+    
+          }); 
+        }
   
       }
   
@@ -505,20 +721,23 @@ function create ()
         var sprite = sprite1.create(205+i*14,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){ 
-          sprite1.clear(_this);
 
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        if(user_num == _turn){ //  when player turn
+          sprite.on('pointerover', function(event){
+            this.y -=70;
+          });
+          sprite.on('pointerout', function(event){
+            this.y +=70;
+          });
+          sprite.on('pointerup', function(pointer){ 
+            sprite1.clear(_this);
+
+            // ----- play a card
+            game.socket.emit('play_a_card',room_num, user_num, this.name);
+            field_card.setTexture(player_arr[this.name]);
+    
+          }); 
+        }
   
       }
   
@@ -531,20 +750,23 @@ function create ()
         var sprite = sprite1.create(205+i*10,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){ 
-          sprite1.clear(_this);
 
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        if(user_num == _turn){ //  when player turn
+          sprite.on('pointerover', function(event){
+            this.y -=70;
+          });
+          sprite.on('pointerout', function(event){
+            this.y +=70;
+          });
+          sprite.on('pointerup', function(pointer){ 
+            sprite1.clear(_this);
+
+            // ----- play a card
+            game.socket.emit('play_a_card',room_num, user_num, this.name);
+            field_card.setTexture(player_arr[this.name]);
+    
+          }); 
+        }
   
       }
   
@@ -557,20 +779,23 @@ function create ()
         var sprite = sprite1.create(205+i*6,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){ 
-          sprite1.clear(_this);
 
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        if(user_num == _turn){ //  when player turn
+          sprite.on('pointerover', function(event){
+            this.y -=70;
+          });
+          sprite.on('pointerout', function(event){
+            this.y +=70;
+          });
+          sprite.on('pointerup', function(pointer){ 
+            sprite1.clear(_this);
+
+            // ----- play a card
+            game.socket.emit('play_a_card',room_num, user_num, this.name);
+            field_card.setTexture(player_arr[this.name]);
+    
+          }); 
+        }
   
       }
   
@@ -609,9 +834,33 @@ function create ()
 
         for(var i=0; i<player_arr.length; i++)
         {
-          var sprite = sprite2.create(815,340-i*20,'other_card')
-          sprite.angle += 270;
-          sprite.name = i;
+          if(player_arr.length <= 12){
+            if(i < 11){
+              var sprite = sprite2.create(815,340-i*20,'other_card')
+              sprite.angle += 270;
+              sprite.name = i;
+            }
+            else if(i == 11){
+              var sprite = sprite2.create(815,340-i*20,'other_card')
+              sprite.angle += 270;
+              sprite.name = i;
+            }
+          }
+          else if(player_arr.length > 12){
+            if(i < 11){
+              var sprite = sprite2.create(815,340-i*20,'other_card')
+              sprite.angle += 270;
+              sprite.name = i;
+            }
+            else if(i == 11){
+              var sprite = sprite2.create(815,340-i*20,'p_other_card')
+              sprite.angle += 270;
+              sprite.name = i;
+            }
+            else if(i > 11){
+              break;
+            }
+          }
         }
   
   });
@@ -621,9 +870,33 @@ function create ()
 
         for(var i=0; i<player_arr.length; i++)
         {
-          var sprite = sprite3.create(547-i*20,73,'other_card')
-          sprite.angle += 180;
-          sprite.name = i;
+          if(player_arr.length <= 12){
+            if(i < 11){
+              var sprite = sprite3.create(547-i*20,73,'other_card')
+              sprite.angle += 180;
+              sprite.name = i;
+            }
+            else if(i == 11){
+              var sprite = sprite3.create(547-i*20,73,'other_card')
+              sprite.angle += 180;
+              sprite.name = i;
+            }
+          }
+          else if(player_arr.length > 12){
+            if(i < 11){
+              var sprite = sprite3.create(547-i*20,73,'other_card')
+              sprite.angle += 180;
+              sprite.name = i;
+            }
+            else if(i == 11){
+              var sprite = sprite3.create(547-i*20,73,'p_other_card')
+              sprite.angle += 180;
+              sprite.name = i;
+            }
+            else if(i > 11){
+              break;
+            }
+          }
         }
   
   });
@@ -633,22 +906,50 @@ function create ()
 
       for(var i=0; i<player_arr.length; i++)
       {
-        var sprite = sprite4.create(85,334-i*20,'other_card')
-        sprite.angle += 90;
-        sprite.name = i;
+        if(player_arr.length <= 12){
+          if(i < 11){
+            var sprite = sprite4.create(85,334-i*20,'other_card')
+            sprite.angle += 90;
+            sprite.name = i;
+          }
+          else if(i == 11){
+            var sprite = sprite4.create(85,334-i*20,'other_card')
+            sprite.angle += 90;
+            sprite.name = i;
+          }
+        }
+        else if(player_arr.length > 12){
+          if(i < 11){
+            var sprite = sprite4.create(85,334-i*20,'other_card')
+            sprite.angle += 90;
+            sprite.name = i;
+          }
+          else if(i == 11){
+            var sprite = sprite4.create(85,334-i*20,'p_other_card')
+            sprite.angle += 90;
+            sprite.name = i;
+          }
+          else if(i > 11){
+            break;
+          }
+        }
       }
 
   });
 
   // ----- set_field_card
-  game.socket.on('set_field_card', function(_field_card){
-    field_card = _this.add.image(380,250,_field_card).setInteractive();
+  game.socket.on('set_field_card', function(_field_card, _num){
+
+    // num == 1 : create player nums
+    // num == 2 : refresh player nums
+    
+    if(_num == 1){
+      field_card = _this.add.image(380,250,_field_card).setInteractive();
+    }
+    else if(_num == 2){
+      field_card.setTexture(_field_card);
+    }
   });
-}
-
-
-function yuno_effect(){
-  player_num1.setTexture('num_1');
 }
 
 function other_card(_this,num) {
@@ -694,6 +995,12 @@ function get_card(_this){
 function refresh_cards(_this){
   console.log("refresh_cards");
 
+  //----- player_nums
+  game.socket.emit('get_player_nums',room_num, user_num, 2);
+
+  //----- dummy
+  game.socket.emit('get_dummy_length',room_num, user_num, 2);
+
   //----- player_cards
 
   // player1
@@ -712,12 +1019,8 @@ function refresh_cards(_this){
     other_card(_this,4);
   }
 
-  // field_card
-
-  // ----- get_field_card
-  game.socket.emit('get_field_card',room_num);
-
-  field_card.destroy();
+  // ----- field_card
+  game.socket.emit('get_field_card',room_num, 2);
 }
 
 function update(){

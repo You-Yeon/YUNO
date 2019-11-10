@@ -276,21 +276,25 @@ router.get('/assets/yuno_num_button', function(req, res){
 router.get('/assets/other_back_card', function(req, res){
     res.sendFile(__dirname + '/assets/other_back_card.png');
 });
+
+router.get('/assets/p_other_back_card', function(req, res){
+    res.sendFile(__dirname + '/assets/p_other_back_card.png');
+});
   
 router.get('/assets/focus_num_button_1', function(req, res){
     res.sendFile(__dirname + '/assets/focus_num_button_1.png');
 });
   
 router.get('/assets/focus_num_button_2', function(req, res){
-    res.sendFile(__dirname + '/assets/focus_num_button_1.png');
+    res.sendFile(__dirname + '/assets/focus_num_button_2.png');
 });
   
 router.get('/assets/focus_num_button_3', function(req, res){
-    res.sendFile(__dirname + '/assets/focus_num_button_1.png');
+    res.sendFile(__dirname + '/assets/focus_num_button_3.png');
 });
   
 router.get('/assets/focus_num_button_4', function(req, res){
-    res.sendFile(__dirname + '/assets/focus_num_button_1.png');
+    res.sendFile(__dirname + '/assets/focus_num_button_4.png');
 });
   
 router.get('/assets/focus_yuno_num_button', function(req, res){
