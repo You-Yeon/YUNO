@@ -5,6 +5,10 @@ router.get('/img', function(req, res){
     res.sendFile(__dirname + '/images/1.png');
 });
 
+router.get('/assets/background', function(req, res){
+    res.sendFile(__dirname + '/assets/background.png');
+});
+
 router.get('/assets/board', function(req, res){
     res.sendFile(__dirname + '/assets/board.png');
 });

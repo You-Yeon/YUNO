@@ -1,4 +1,3 @@
-
 //------ getting cookies
 
   // getCookie
@@ -19,7 +18,7 @@
 
 var config = {
     type: Phaser.AUTO,
-    width: 900,
+    width: 1300,
     height: 600,
     physics : {
       default: 'arcade',
@@ -36,6 +35,7 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+    this.load.image('background', '/assets/background');
     this.load.image('board', '/assets/board');
     this.load.image('board2', '/assets/board2');
     this.load.image('board3', '/assets/board3');
@@ -144,11 +144,21 @@ var player_num1;
 var player_num2;
 var player_num3;
 var player_num4;
+var game_direction;
 
 var player1_num_img;
 var player2_num_img;
 var player3_num_img;
 var player4_num_img;
+var direction_img;
+
+var user_text1;
+var user_text2;
+var user_text3;
+var user_text4;
+var direction_text;
+
+var socket_id;
 
 function create ()
 {
@@ -160,8 +170,22 @@ function create ()
   var _this = this;
   game.socket = io();
 
+  // ----- get sockect id
+  game.socket.on('push_socket_id', function(_socket_id){
+    socket_id = _socket_id
+    console.log(user_num + " : " + socket_id);
+  });
+
+  // ----- sockect info check
+  game.socket.on('socket_info_check', function(){
+    game.socket.emit('setting_socket',socket_id, room_num, user_num);
+  });
+
   // ----- start
   game.socket.on('start', function(){
+
+    // ----- set background
+    _this.add.image(550,300,'background');
 
     // ----- set board
     if (user_count == 2){
@@ -174,7 +198,10 @@ function create ()
       _this.add.image(450,300,'board4');
     }
 
-    // game.socket.emit('aa','aa');
+    // ----- set texts
+
+    // get_text_info
+    game.socket.emit('get_text_info',room_num, user_num);
 
     // ----- set cards
 
@@ -229,10 +256,10 @@ function create ()
       field_card = _this.add.image(380,250,_field_card).setInteractive();
     });
 
-    // ----- get player nums
+    // ----- set player nums and direction
     game.socket.emit('get_player_nums',room_num, user_num, 1);
 
-    // ----- yuno_button
+    // ----- set yuno_button
     yuno_button = _this.add.image(790,528,'yuno_button_on').setInteractive();
     yuno_button.inputEnabled = true;
     
@@ -253,39 +280,135 @@ function create ()
   });
 
   // ----- get dummy and set dummy
-  game.socket.on('set_dummy1', function(length){
+  game.socket.on('set_dummy1', function(length, _turn){
 
-    if(length > 0){
-      if(length == 1){
-        dummy.setTexture('back_card');
+    if(user_num == _turn){
+      if(length > 0){
+        if(length == 1){
+          dummy.setTexture('back_card');
+        }
+        game.socket.emit('pointerup_dummy',room_num, user_num);
       }
-      game.socket.emit('pointerup_dummy',room_num, user_num);
-    }
-    else{
-      dummy.destroy();
+      else{
+        dummy.destroy();
+      }
     }
   
   });
 
   // ----- refresh dummy
-  game.socket.on('set_dummy2', function(length){
+  game.socket.on('set_dummy2', function(length, _turn){
 
-    if(length > 0){
-      if(length == 1){
-        dummy.setTexture('back_card');
+    if(user_num == _turn){
+      if(length > 0){
+        if(length == 1){
+          dummy.setTexture('back_card');
+        }
+      }
+      else{
+        dummy.destroy();
       }
     }
-    else{
-      dummy.destroy();
-    }
-    
   });
 
-  // ----- set_player_nums
-  game.socket.on('set_player_nums', function(player_arr, _turn, _dir, _num){
+  // ----- set_text_info
+  game.socket.on('set_text_info', function(num_arr, name_arr){
 
-    // num == 1 : create player nums
-    // num == 2 : refresh player nums
+    // user text
+    if(user_count == 2){ 
+      user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text1.setStroke('#000', 7);
+
+      user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text2.setStroke('#000', 7);
+
+    }
+    else if(user_count == 3){
+      user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text1.setStroke('#000', 7);
+
+      user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text2.setStroke('#000', 7);
+
+      user_text3 = _this.add.text(910, 120, 'Player'+ num_arr[2] +' : ' + name_arr[2], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text3.setStroke('#000', 7);
+      
+    }
+    else if(user_count == 4){
+      user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text1.setStroke('#000', 7);
+
+      user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text2.setStroke('#000', 7);
+
+      user_text3 = _this.add.text(910, 120, 'Player'+ num_arr[2] +' : ' + name_arr[2], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text3.setStroke('#000', 7);
+      
+      user_text4 = _this.add.text(910, 170, 'Player'+ num_arr[3] +' : ' + name_arr[3], {
+        font: "30px DungGeunMo",
+        fill: "#43d637",
+        align: "center"
+      });
+
+      user_text4.setStroke('#000', 7);
+
+    }
+
+    // direction text
+    direction = _this.add.text(910, 550, "진행 방향 : 반시계 방향", {
+      font: "30px DungGeunMo",
+      fill: "#43d637",
+      align: "center"
+    });
+
+    direction.setStroke('#000', 7);
+  });
+  
+  // ----- set_player_nums and direction
+  game.socket.on('set_player_nums_and_direction', function(player_arr, _turn, _dir, _num){
+
+    // num == 1 : create player nums and direction
+    // num == 2 : refresh player nums and direction
     var direction;
 
     console.log("set player nums");
@@ -294,9 +417,11 @@ function create ()
     // --- setting direction
     if(_dir == 0){ // 반시계 방향 ( + )
       direction = 1;
+      direction_img = 'l_direction'; 
     }
     else if(_dir == 1){ // 시계 방향 ( - )
       direction = -1;
+      direction_img = 'r_direction'; 
     }
 
     //find index
@@ -623,6 +748,8 @@ function create ()
       if (user_count == 4){
         player_num4 = _this.add.image(98,54,player4_num_img).setInteractive();
       }
+      
+      game_direction = _this.add.image(590,290,direction_img).setInteractive();
     }
     else if(_num == 2){
       // num 1 
@@ -640,6 +767,8 @@ function create ()
       if (user_count == 4){
         player_num4.setTexture(player4_num_img);
       }
+
+      game_direction.setTexture(direction_img);
     }
 
   });
