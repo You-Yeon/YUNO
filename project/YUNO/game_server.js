@@ -133,14 +133,14 @@ var Shuffle_cards = function(room_num, user_count){
   var k;
   
   //dummy cards
-  g_dummy_cards[room_num].push("y0", "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
-  "y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y_r", "y_b", "y_p",
-  "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
-  "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r_r", "r_b", "r_p",
-  "g0", "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
-  "g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9", "g_r", "g_b", "g_p",
-  "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
-  "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b_r", "b_b", "b_p",
+  g_dummy_cards[room_num].push("y_0", "y_1", "y_2", "y_3", "y_4", "y_5", "y_6", "y_7", "y_8", "y_9", "y_r", "y_b", "y_p",
+  "y_1", "y_2", "y_3", "y_4", "y_5", "y_6", "y_7", "y_8", "y_9", "y_r", "y_b", "y_p",
+  "r_0", "r_1", "r_2", "r_3", "r_4", "r_5", "r_6", "r_7", "r_8", "r_9", "r_r", "r_b", "r_p",
+  "r_1", "r_2", "r_3", "r_4", "r_5", "r_6", "r_7", "r_8", "r_9", "r_r", "r_b", "r_p",
+  "g_0", "g_1", "g_2", "g_3", "g_4", "g_5", "g_6", "g_7", "g_8", "g_9", "g_r", "g_b", "g_p",
+  "g_1", "g_2", "g_3", "g_4", "g_5", "g_6", "g_7", "g_8", "g_9", "g_r", "g_b", "g_p",
+  "b_0", "b_1", "b_2", "b_3", "b_4", "b_5", "b_6", "b_7", "b_8", "b_9", "b_r", "b_b", "b_p",
+  "b_1", "b_2", "b_3", "b_4", "b_5", "b_6", "b_7", "b_8", "b_9", "b_r", "b_b", "b_p",
   "4_p", "4_p", "4_p", "4_p", "c_c", "c_c","c_c","c_c");
 
   // player cards
@@ -239,12 +239,17 @@ var ArraySort = function(room_num){
 
   // setting direction
   g_direction_is.push(0); // 0 : 반시계, 1 : 시계
+  
+  // setting bomb
+  g_bomb_cnt.push(0); // 폭탄 갯수
 
   console.log("F g_user_num : " + g_user_num);
   console.log("F g_user_name : " + g_user_name);
   console.log("F g_user_state : " + g_user_state);
   console.log("F g_user_socketID_check : " + g_user_socketID_check);
   console.log("F g_user_socketID : " + g_user_socketID);
+
+  console.log("g_bomb_cnt : "+ g_bomb_cnt);
 }
 
 io.on('connection', function(socket){
@@ -320,9 +325,21 @@ io.on('connection', function(socket){
     var index = g_user_num[r_num].indexOf(u_num);
     var temp = g_player_cards[r_num][index].split('/');
 
-    temp.push(g_dummy_cards[r_num][k]);
-    g_player_cards[r_num][index] =temp.join('/');
-    g_dummy_cards[r_num].splice(k,1);
+    if(g_bomb_cnt[r_num] > 0){ // when bomb count > 0
+      for(var i = 0; i < g_bomb_cnt[r_num]; i++){
+        k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+        temp.push(g_dummy_cards[r_num][k]);
+      }
+      g_player_cards[r_num][index] = temp.join('/');
+      g_dummy_cards[r_num].splice(k,1);
+
+      g_bomb_cnt[r_num] = 0; // reset
+    }
+    else{ // bomb count == 0
+      temp.push(g_dummy_cards[r_num][k]);
+      g_player_cards[r_num][index] = temp.join('/');
+      g_dummy_cards[r_num].splice(k,1);
+    }
 
     // turn setting
     var direction;
@@ -371,10 +388,18 @@ io.on('connection', function(socket){
   });
 
   socket.on('get_field_card', function(r_num, _num){
-
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1], _num);
     }
+
+  });
+
+  socket.on('get_bomb_count', function(r_num){
+    var bomb_cnt = g_bomb_cnt[r_num];
+
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_bomb', bomb_cnt);
+    }0
 
   });
 
@@ -382,11 +407,11 @@ io.on('connection', function(socket){
 
     var index = g_user_num[r_num].indexOf(u_num);
     var temp = g_player_cards[r_num][index].split('/');
+    var field = g_field_card[r_num][g_field_card[r_num].length-1];
+    var bombs = g_bomb_cnt[r_num];
     var turn = g_turn_is[r_num];
-    
-    console.log(g_user_num[r_num][index]+ " : " + temp);
 
-    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, turn);
+    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, field, bombs, turn);
 
   });
 
@@ -432,10 +457,21 @@ io.on('connection', function(socket){
     var index = g_user_num[r_num].indexOf(u_num);
     var temp = g_player_cards[r_num][index].split('/');
 
-    if(temp[_index]){ // When matching
-      console.log("match");
+    if(temp[_index]){ // When player have the card
       console.log("temp[_index] :" + temp[_index]);
-      
+
+      var temp_split = temp[_index].split("_");
+
+      // when player card is plus card
+      if(temp_split[1] == 'p'){
+        if(temp_split[0] == '4'){ // plus 4 card
+          g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 4;
+        }
+        else{ // plus 2 card
+          g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 2;
+        }
+      }
+
       // get card and push the field card
       g_field_card[r_num].push(temp[_index]);
       temp.splice(_index,1);
@@ -444,6 +480,16 @@ io.on('connection', function(socket){
       // turn setting
       var direction;
       var index;
+
+      // when player card is arrow card
+      if(temp_split[1] == 'r'){
+        if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
+          g_direction_is[r_num] = 1;
+        }
+        else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
+          g_direction_is[r_num] = 0;
+        }
+      }
 
       // --- setting direction
       if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
@@ -455,13 +501,34 @@ io.on('connection', function(socket){
       
       // --- find index
       index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
-      index += direction;
 
-      if(index == g_user_num[r_num].length){
-        index = 0;
+      // when player card is ban card
+      if(temp_split[1] == 'b'){
+        index += direction*2;
+
+        if(index == g_user_num[r_num].length){
+          index = 0;
+        }
+        else if(index == -1){
+          index = g_user_num[r_num].length - 1;
+        }
+        else if(index == g_user_num[r_num].length + 1){
+          index = 1;
+        }
+        else if(index == -2){
+          index = g_user_num[r_num].length - 2;
+        }
+
       }
-      else if(index == -1){
-        index = g_user_num[r_num].length - 1;
+      else{ // or not ban card
+        index += direction;
+
+        if(index == g_user_num[r_num].length){
+          index = 0;
+        }
+        else if(index == -1){
+          index = g_user_num[r_num].length - 1;
+        }
       }
 
       g_turn_is[r_num] = g_user_num[r_num][index];

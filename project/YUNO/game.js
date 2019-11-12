@@ -45,58 +45,58 @@ function preload ()
     this.load.image('yuno_button_on','/assets/yuno_button_on');
     this.load.image('yuno_button_off','/assets/yuno_button_off');
 
-    this.load.image('y0', '/assets/y_card_0');
-    this.load.image('y1', '/assets/y_card_1');
-    this.load.image('y2', '/assets/y_card_2');
-    this.load.image('y3', '/assets/y_card_3');
-    this.load.image('y4', '/assets/y_card_4');
-    this.load.image('y5', '/assets/y_card_5');
-    this.load.image('y6', '/assets/y_card_6');
-    this.load.image('y7', '/assets/y_card_7');
-    this.load.image('y8', '/assets/y_card_8');
-    this.load.image('y9', '/assets/y_card_9');
+    this.load.image('y_0', '/assets/y_card_0');
+    this.load.image('y_1', '/assets/y_card_1');
+    this.load.image('y_2', '/assets/y_card_2');
+    this.load.image('y_3', '/assets/y_card_3');
+    this.load.image('y_4', '/assets/y_card_4');
+    this.load.image('y_5', '/assets/y_card_5');
+    this.load.image('y_6', '/assets/y_card_6');
+    this.load.image('y_7', '/assets/y_card_7');
+    this.load.image('y_8', '/assets/y_card_8');
+    this.load.image('y_9', '/assets/y_card_9');
     this.load.image('y_r', '/assets/y_card_arrow');
     this.load.image('y_b', '/assets/y_card_ban');
     this.load.image('y_p', '/assets/y_card_plus_2');
 
-    this.load.image('r0', '/assets/r_card_0');
-    this.load.image('r1', '/assets/r_card_1');
-    this.load.image('r2', '/assets/r_card_2');
-    this.load.image('r3', '/assets/r_card_3');
-    this.load.image('r4', '/assets/r_card_4');
-    this.load.image('r5', '/assets/r_card_5');
-    this.load.image('r6', '/assets/r_card_6');
-    this.load.image('r7', '/assets/r_card_7');
-    this.load.image('r8', '/assets/r_card_8');
-    this.load.image('r9', '/assets/r_card_9');
+    this.load.image('r_0', '/assets/r_card_0');
+    this.load.image('r_1', '/assets/r_card_1');
+    this.load.image('r_2', '/assets/r_card_2');
+    this.load.image('r_3', '/assets/r_card_3');
+    this.load.image('r_4', '/assets/r_card_4');
+    this.load.image('r_5', '/assets/r_card_5');
+    this.load.image('r_6', '/assets/r_card_6');
+    this.load.image('r_7', '/assets/r_card_7');
+    this.load.image('r_8', '/assets/r_card_8');
+    this.load.image('r_9', '/assets/r_card_9');
     this.load.image('r_r', '/assets/r_card_arrow');
     this.load.image('r_b', '/assets/r_card_ban');
     this.load.image('r_p', '/assets/r_card_plus_2');
 
-    this.load.image('g0', '/assets/g_card_0');
-    this.load.image('g1', '/assets/g_card_1');
-    this.load.image('g2', '/assets/g_card_2');
-    this.load.image('g3', '/assets/g_card_3');
-    this.load.image('g4', '/assets/g_card_4');
-    this.load.image('g5', '/assets/g_card_5');
-    this.load.image('g6', '/assets/g_card_6');
-    this.load.image('g7', '/assets/g_card_7');
-    this.load.image('g8', '/assets/g_card_8');
-    this.load.image('g9', '/assets/g_card_9');
+    this.load.image('g_0', '/assets/g_card_0');
+    this.load.image('g_1', '/assets/g_card_1');
+    this.load.image('g_2', '/assets/g_card_2');
+    this.load.image('g_3', '/assets/g_card_3');
+    this.load.image('g_4', '/assets/g_card_4');
+    this.load.image('g_5', '/assets/g_card_5');
+    this.load.image('g_6', '/assets/g_card_6');
+    this.load.image('g_7', '/assets/g_card_7');
+    this.load.image('g_8', '/assets/g_card_8');
+    this.load.image('g_9', '/assets/g_card_9');
     this.load.image('g_r', '/assets/g_card_arrow');
     this.load.image('g_b', '/assets/g_card_ban');
     this.load.image('g_p', '/assets/g_card_plus_2');
 
-    this.load.image('b0', '/assets/b_card_0');
-    this.load.image('b1', '/assets/b_card_1');
-    this.load.image('b2', '/assets/b_card_2');
-    this.load.image('b3', '/assets/b_card_3');
-    this.load.image('b4', '/assets/b_card_4');
-    this.load.image('b5', '/assets/b_card_5');
-    this.load.image('b6', '/assets/b_card_6');
-    this.load.image('b7', '/assets/b_card_7');
-    this.load.image('b8', '/assets/b_card_8');
-    this.load.image('b9', '/assets/b_card_9');
+    this.load.image('b_0', '/assets/b_card_0');
+    this.load.image('b_1', '/assets/b_card_1');
+    this.load.image('b_2', '/assets/b_card_2');
+    this.load.image('b_3', '/assets/b_card_3');
+    this.load.image('b_4', '/assets/b_card_4');
+    this.load.image('b_5', '/assets/b_card_5');
+    this.load.image('b_6', '/assets/b_card_6');
+    this.load.image('b_7', '/assets/b_card_7');
+    this.load.image('b_8', '/assets/b_card_8');
+    this.load.image('b_9', '/assets/b_card_9');
     this.load.image('b_r', '/assets/b_card_arrow');
     this.load.image('b_b', '/assets/b_card_ban');
     this.load.image('b_p', '/assets/b_card_plus_2');
@@ -128,6 +128,8 @@ function preload ()
     this.load.image('r_direction', '/assets/direction');
     this.load.image('l_direction', '/assets/direction2');
 
+    this.load.image('bomb', '/assets/bomb');
+
 }
 
 var sprite;
@@ -157,6 +159,9 @@ var user_text2;
 var user_text3;
 var user_text4;
 var direction_text;
+
+var bomb;
+var bomb_text;
 
 var socket_id;
 
@@ -214,6 +219,32 @@ function create ()
       // ----- get dummy length
       game.socket.emit('get_dummy_length',room_num, user_num, 1);
     });
+
+    // ----- set direction text
+    direction_text = _this.add.text(910, 550, "진행 방향 : 반시계 방향", {
+      font: "30px DungGeunMo",
+      fill: "#56FF37",
+      align: "center"
+    });
+
+    direction_text.setStroke('#000', 7);
+
+    // ----- set bomb image and text
+    bomb = _this.add.sprite(495, 241,'bomb').setInteractive();
+    bomb.on('pointerup', function(pointer){
+
+      // ----- get dummy length
+      game.socket.emit('get_dummy_length',room_num, user_num, 1);
+    });
+    bomb.visible = false;
+
+    bomb_text = _this.add.text(480, 238, "0", {
+      font: "25px DungGeunMo",
+      fill: "#000000",
+      align: "center"
+    });
+    bomb_text.setStroke('#fff', 4);
+    bomb_text.visible = false;
 
     //player cards
     sprite1 = _this.add.group();
@@ -311,14 +342,13 @@ function create ()
     }
   });
 
-  // ----- set_text_info
+  // ----- set_text_info (player)
   game.socket.on('set_text_info', function(num_arr, name_arr){
-
     // user text
     if(user_count == 2){ 
       user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -326,7 +356,7 @@ function create ()
 
       user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -336,7 +366,7 @@ function create ()
     else if(user_count == 3){
       user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -344,7 +374,7 @@ function create ()
 
       user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -352,7 +382,7 @@ function create ()
 
       user_text3 = _this.add.text(910, 120, 'Player'+ num_arr[2] +' : ' + name_arr[2], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -362,7 +392,7 @@ function create ()
     else if(user_count == 4){
       user_text1 = _this.add.text(910, 20, "Player"+ num_arr[0] +' : ' + name_arr[0], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -370,7 +400,7 @@ function create ()
 
       user_text2 = _this.add.text(910, 70, 'Player'+ num_arr[1] +' : ' + name_arr[1], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -378,7 +408,7 @@ function create ()
 
       user_text3 = _this.add.text(910, 120, 'Player'+ num_arr[2] +' : ' + name_arr[2], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -386,7 +416,7 @@ function create ()
       
       user_text4 = _this.add.text(910, 170, 'Player'+ num_arr[3] +' : ' + name_arr[3], {
         font: "30px DungGeunMo",
-        fill: "#43d637",
+        fill: "#56FF37",
         align: "center"
       });
 
@@ -394,14 +424,29 @@ function create ()
 
     }
 
-    // direction text
-    direction = _this.add.text(910, 550, "진행 방향 : 반시계 방향", {
-      font: "30px DungGeunMo",
-      fill: "#43d637",
-      align: "center"
-    });
+  });
 
-    direction.setStroke('#000', 7);
+  // ----- set_text_info (bomb)
+  game.socket.on('set_bomb', function(_bomb_cnt){
+    // bomb text and bomb image
+    if(_bomb_cnt > 0){ // when bomb count > 0
+      bomb.visible = true; // image on
+      bomb_text.visible = true; // text on
+
+      // bomb text
+      if(_bomb_cnt < 10){ // bomb count < 10 
+        bomb_text.setText("0"+ String(_bomb_cnt));
+      }
+      else{ // bomb count >= 10
+        bomb_text.setText(String(_bomb_cnt));
+      }
+
+    }
+    else if(_bomb_cnt == 0){ // bomb count == 0
+      bomb.visible = false; // image off
+      bomb_text.visible = false; // text off
+    }
+
   });
   
   // ----- set_player_nums and direction
@@ -417,11 +462,13 @@ function create ()
     // --- setting direction
     if(_dir == 0){ // 반시계 방향 ( + )
       direction = 1;
-      direction_img = 'l_direction'; 
+      direction_img = 'l_direction';
+      direction_text.setText("진행 방향 : 반시계 방향");
     }
     else if(_dir == 1){ // 시계 방향 ( - )
       direction = -1;
       direction_img = 'r_direction'; 
+      direction_text.setText("진행 방향 : 시계 방향");
     }
 
     //find index
@@ -774,7 +821,7 @@ function create ()
   });
 
   // ----- set_player_info
-  game.socket.on('set_player_info', function(player_arr, _turn){
+  game.socket.on('set_player_info', function(player_arr, _field, _bombs, _turn){
 
     sprite1.clear(_this);
     // sprite1.destroy();
@@ -783,8 +830,12 @@ function create ()
     console.log("set_player_info");
     console.log("player_arr :" + player_arr);
   
+    var field_split = _field.split("_"); 
+    var temp_split;
+
     if(player_arr.length == 0){
       sprite1.destroy();
+      sprite1.visible = false;
     }
     else if(player_arr.length < 20){
   
@@ -793,22 +844,52 @@ function create ()
         sprite = sprite1.create(205+i*25,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
+        temp_split = player_arr[i].split("_");
         
         if(user_num == _turn){ //  when player turn
-          sprite.on('pointerover', function(event){
-            this.y -=70;
-          });
-          sprite.on('pointerout', function(event){
-            this.y +=70;
-          });
-          sprite.on('pointerup', function(pointer){
-            sprite1.clear(_this);
-            
-            // ----- play a card
-            game.socket.emit('play_a_card',room_num, user_num, this.name);
-            field_card.setTexture(player_arr[this.name]);
-    
-          });
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
+
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
         }
   
       }
@@ -821,28 +902,57 @@ function create ()
         var sprite = sprite1.create(205+i*18,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
+        temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          sprite.on('pointerover', function(event){
-            this.y -=70;
-          });
-          sprite.on('pointerout', function(event){
-            this.y +=70;
-          });
-          sprite.on('pointerup', function(pointer){ 
-            sprite1.clear(_this);
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
 
-            // ----- play a card
-            game.socket.emit('play_a_card',room_num, user_num, this.name);
-            field_card.setTexture(player_arr[this.name]);
-    
-          }); 
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
         }
   
       }
   
     }
-  
     else if(player_arr.length < 34){
   
       for(var i=0; i<player_arr.length; i++)
@@ -850,28 +960,57 @@ function create ()
         var sprite = sprite1.create(205+i*14,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
+        temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          sprite.on('pointerover', function(event){
-            this.y -=70;
-          });
-          sprite.on('pointerout', function(event){
-            this.y +=70;
-          });
-          sprite.on('pointerup', function(pointer){ 
-            sprite1.clear(_this);
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
 
-            // ----- play a card
-            game.socket.emit('play_a_card',room_num, user_num, this.name);
-            field_card.setTexture(player_arr[this.name]);
-    
-          }); 
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
         }
   
       }
   
     }
-  
     else if(player_arr.length < 47){
   
       for(var i=0; i<player_arr.length; i++)
@@ -879,28 +1018,57 @@ function create ()
         var sprite = sprite1.create(205+i*10,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
+        temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          sprite.on('pointerover', function(event){
-            this.y -=70;
-          });
-          sprite.on('pointerout', function(event){
-            this.y +=70;
-          });
-          sprite.on('pointerup', function(pointer){ 
-            sprite1.clear(_this);
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
 
-            // ----- play a card
-            game.socket.emit('play_a_card',room_num, user_num, this.name);
-            field_card.setTexture(player_arr[this.name]);
-    
-          }); 
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
         }
   
       }
   
     }
-  
     else if(player_arr.length < 77){
   
       for(var i=0; i<player_arr.length; i++)
@@ -908,28 +1076,57 @@ function create ()
         var sprite = sprite1.create(205+i*6,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
+        temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          sprite.on('pointerover', function(event){
-            this.y -=70;
-          });
-          sprite.on('pointerout', function(event){
-            this.y +=70;
-          });
-          sprite.on('pointerup', function(pointer){ 
-            sprite1.clear(_this);
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
 
-            // ----- play a card
-            game.socket.emit('play_a_card',room_num, user_num, this.name);
-            field_card.setTexture(player_arr[this.name]);
-    
-          }); 
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
         }
   
       }
   
     }
-  
     else{
   
       for(var i=0; i<player_arr.length; i++)
@@ -937,20 +1134,53 @@ function create ()
         var sprite = sprite1.create(205+i*4,475,player_arr[i]).setInteractive();
         sprite.name = i;
         sprite.inputEnabled = true;
-        sprite.on('pointerover', function(event){
-          this.y -=70;
-        });
-        sprite.on('pointerout', function(event){
-          this.y +=70;
-        });
-        sprite.on('pointerup', function(pointer){ 
-          sprite1.clear(_this);
-          
-          // ----- play a card
-          game.socket.emit('play_a_card',room_num, user_num, this.name);
-          field_card.setTexture(player_arr[this.name]);
-  
-        });
+        temp_split = player_arr[i].split("_");
+
+        if(user_num == _turn){ //  when player turn
+          if(_bombs > 0){ // bomb count > 0
+            if(temp_split[1] == 'p'){ // player can play a bomb card
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+          else{ // bomb count == 0
+            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+              // 1. same color
+              // 2. same number || same arrow || same ban || same plus
+              // 3. player card is plus 4 card
+              // 4. player card is change color
+              // 5. field card is plus 4 card
+              // 6. field card is change color
+
+              sprite.on('pointerover', function(event){
+                this.y -=70;
+              });
+              sprite.on('pointerout', function(event){
+                this.y +=70;
+              });
+              sprite.on('pointerup', function(pointer){
+                sprite1.clear(_this);
+                
+                // ----- play a card
+                game.socket.emit('play_a_card',room_num, user_num, this.name);
+                field_card.setTexture(player_arr[this.name]);
+        
+              });
+            }
+          }
+        }
   
       }
   
@@ -1150,6 +1380,9 @@ function refresh_cards(_this){
 
   // ----- field_card
   game.socket.emit('get_field_card',room_num, 2);
+
+  // ----- bomb
+  game.socket.emit('get_bomb_count',room_num);
 }
 
 function update(){

@@ -333,4 +333,8 @@ router.get('/assets/direction2', function(req, res){
     res.sendFile(__dirname + '/assets/direction2.png');
 });
 
+router.get('/assets/bomb', function(req, res){
+    res.sendFile(__dirname + '/assets/bomb.png');
+});
+
 module.exports = router;
