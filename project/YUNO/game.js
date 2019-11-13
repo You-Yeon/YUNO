@@ -20,6 +20,9 @@ var config = {
     type: Phaser.AUTO,
     width: 1300,
     height: 600,
+    audio: {
+      disableWebAudio: true
+    },
     physics : {
       default: 'arcade',
       arcade: { debug: true }
@@ -35,101 +38,105 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('background', '/assets/background');
-    this.load.image('board', '/assets/board');
-    this.load.image('board2', '/assets/board2');
-    this.load.image('board3', '/assets/board3');
-    this.load.image('board4', '/assets/board4');
-    this.load.image('back_card', '/assets/back_card');
-    this.load.image('card_dummy','/assets/card_dummy');
-    this.load.image('yuno_button_on','/assets/yuno_button_on');
-    this.load.image('yuno_button_off','/assets/yuno_button_off');
+  // load image
+  this.load.image('background', '/assets/background');
+  this.load.image('board', '/assets/board');
+  this.load.image('board2', '/assets/board2');
+  this.load.image('board3', '/assets/board3');
+  this.load.image('board4', '/assets/board4');
+  this.load.image('back_card', '/assets/back_card');
+  this.load.image('card_dummy','/assets/card_dummy');
+  this.load.image('yuno_button_on','/assets/yuno_button_on');
+  this.load.image('yuno_button_off','/assets/yuno_button_off');
 
-    this.load.image('y_0', '/assets/y_card_0');
-    this.load.image('y_1', '/assets/y_card_1');
-    this.load.image('y_2', '/assets/y_card_2');
-    this.load.image('y_3', '/assets/y_card_3');
-    this.load.image('y_4', '/assets/y_card_4');
-    this.load.image('y_5', '/assets/y_card_5');
-    this.load.image('y_6', '/assets/y_card_6');
-    this.load.image('y_7', '/assets/y_card_7');
-    this.load.image('y_8', '/assets/y_card_8');
-    this.load.image('y_9', '/assets/y_card_9');
-    this.load.image('y_r', '/assets/y_card_arrow');
-    this.load.image('y_b', '/assets/y_card_ban');
-    this.load.image('y_p', '/assets/y_card_plus_2');
+  this.load.image('y_0', '/assets/y_card_0');
+  this.load.image('y_1', '/assets/y_card_1');
+  this.load.image('y_2', '/assets/y_card_2');
+  this.load.image('y_3', '/assets/y_card_3');
+  this.load.image('y_4', '/assets/y_card_4');
+  this.load.image('y_5', '/assets/y_card_5');
+  this.load.image('y_6', '/assets/y_card_6');
+  this.load.image('y_7', '/assets/y_card_7');
+  this.load.image('y_8', '/assets/y_card_8');
+  this.load.image('y_9', '/assets/y_card_9');
+  this.load.image('y_r', '/assets/y_card_arrow');
+  this.load.image('y_b', '/assets/y_card_ban');
+  this.load.image('y_p', '/assets/y_card_plus_2');
 
-    this.load.image('r_0', '/assets/r_card_0');
-    this.load.image('r_1', '/assets/r_card_1');
-    this.load.image('r_2', '/assets/r_card_2');
-    this.load.image('r_3', '/assets/r_card_3');
-    this.load.image('r_4', '/assets/r_card_4');
-    this.load.image('r_5', '/assets/r_card_5');
-    this.load.image('r_6', '/assets/r_card_6');
-    this.load.image('r_7', '/assets/r_card_7');
-    this.load.image('r_8', '/assets/r_card_8');
-    this.load.image('r_9', '/assets/r_card_9');
-    this.load.image('r_r', '/assets/r_card_arrow');
-    this.load.image('r_b', '/assets/r_card_ban');
-    this.load.image('r_p', '/assets/r_card_plus_2');
+  this.load.image('r_0', '/assets/r_card_0');
+  this.load.image('r_1', '/assets/r_card_1');
+  this.load.image('r_2', '/assets/r_card_2');
+  this.load.image('r_3', '/assets/r_card_3');
+  this.load.image('r_4', '/assets/r_card_4');
+  this.load.image('r_5', '/assets/r_card_5');
+  this.load.image('r_6', '/assets/r_card_6');
+  this.load.image('r_7', '/assets/r_card_7');
+  this.load.image('r_8', '/assets/r_card_8');
+  this.load.image('r_9', '/assets/r_card_9');
+  this.load.image('r_r', '/assets/r_card_arrow');
+  this.load.image('r_b', '/assets/r_card_ban');
+  this.load.image('r_p', '/assets/r_card_plus_2');
 
-    this.load.image('g_0', '/assets/g_card_0');
-    this.load.image('g_1', '/assets/g_card_1');
-    this.load.image('g_2', '/assets/g_card_2');
-    this.load.image('g_3', '/assets/g_card_3');
-    this.load.image('g_4', '/assets/g_card_4');
-    this.load.image('g_5', '/assets/g_card_5');
-    this.load.image('g_6', '/assets/g_card_6');
-    this.load.image('g_7', '/assets/g_card_7');
-    this.load.image('g_8', '/assets/g_card_8');
-    this.load.image('g_9', '/assets/g_card_9');
-    this.load.image('g_r', '/assets/g_card_arrow');
-    this.load.image('g_b', '/assets/g_card_ban');
-    this.load.image('g_p', '/assets/g_card_plus_2');
+  this.load.image('g_0', '/assets/g_card_0');
+  this.load.image('g_1', '/assets/g_card_1');
+  this.load.image('g_2', '/assets/g_card_2');
+  this.load.image('g_3', '/assets/g_card_3');
+  this.load.image('g_4', '/assets/g_card_4');
+  this.load.image('g_5', '/assets/g_card_5');
+  this.load.image('g_6', '/assets/g_card_6');
+  this.load.image('g_7', '/assets/g_card_7');
+  this.load.image('g_8', '/assets/g_card_8');
+  this.load.image('g_9', '/assets/g_card_9');
+  this.load.image('g_r', '/assets/g_card_arrow');
+  this.load.image('g_b', '/assets/g_card_ban');
+  this.load.image('g_p', '/assets/g_card_plus_2');
 
-    this.load.image('b_0', '/assets/b_card_0');
-    this.load.image('b_1', '/assets/b_card_1');
-    this.load.image('b_2', '/assets/b_card_2');
-    this.load.image('b_3', '/assets/b_card_3');
-    this.load.image('b_4', '/assets/b_card_4');
-    this.load.image('b_5', '/assets/b_card_5');
-    this.load.image('b_6', '/assets/b_card_6');
-    this.load.image('b_7', '/assets/b_card_7');
-    this.load.image('b_8', '/assets/b_card_8');
-    this.load.image('b_9', '/assets/b_card_9');
-    this.load.image('b_r', '/assets/b_card_arrow');
-    this.load.image('b_b', '/assets/b_card_ban');
-    this.load.image('b_p', '/assets/b_card_plus_2');
+  this.load.image('b_0', '/assets/b_card_0');
+  this.load.image('b_1', '/assets/b_card_1');
+  this.load.image('b_2', '/assets/b_card_2');
+  this.load.image('b_3', '/assets/b_card_3');
+  this.load.image('b_4', '/assets/b_card_4');
+  this.load.image('b_5', '/assets/b_card_5');
+  this.load.image('b_6', '/assets/b_card_6');
+  this.load.image('b_7', '/assets/b_card_7');
+  this.load.image('b_8', '/assets/b_card_8');
+  this.load.image('b_9', '/assets/b_card_9');
+  this.load.image('b_r', '/assets/b_card_arrow');
+  this.load.image('b_b', '/assets/b_card_ban');
+  this.load.image('b_p', '/assets/b_card_plus_2');
 
-    this.load.image('4_p', '/assets/card_plus_4');
-    this.load.image('c_c', '/assets/change_color_card');
+  this.load.image('4_p', '/assets/card_plus_4');
+  this.load.image('c_c', '/assets/change_color_card');
 
-    this.load.image('num_1', '/assets/num_button_1');
-    this.load.image('num_2', '/assets/num_button_2');
-    this.load.image('num_3', '/assets/num_button_3');
-    this.load.image('num_4', '/assets/num_button_4');
-    this.load.image('num_yuno', '/assets/yuno_num_button');
+  this.load.image('num_1', '/assets/num_button_1');
+  this.load.image('num_2', '/assets/num_button_2');
+  this.load.image('num_3', '/assets/num_button_3');
+  this.load.image('num_4', '/assets/num_button_4');
+  this.load.image('num_yuno', '/assets/yuno_num_button');
 
-    this.load.image('other_card', '/assets/other_back_card');
-    this.load.image('p_other_card', '/assets/p_other_back_card');
+  this.load.image('other_card', '/assets/other_back_card');
+  this.load.image('p_other_card', '/assets/p_other_back_card');
 
-    this.load.image('f_num_1', '/assets/focus_num_button_1');
-    this.load.image('f_num_2', '/assets/focus_num_button_2');
-    this.load.image('f_num_3', '/assets/focus_num_button_3');
-    this.load.image('f_num_4', '/assets/focus_num_button_4');
-    this.load.image('f_num_yuno', '/assets/focus_yuno_num_button');
+  this.load.image('f_num_1', '/assets/focus_num_button_1');
+  this.load.image('f_num_2', '/assets/focus_num_button_2');
+  this.load.image('f_num_3', '/assets/focus_num_button_3');
+  this.load.image('f_num_4', '/assets/focus_num_button_4');
+  this.load.image('f_num_yuno', '/assets/focus_yuno_num_button');
 
-    this.load.image('choose_color_board', '/assets/choose_color_board');
-    this.load.image('r_color_card', '/assets/red_color_card');
-    this.load.image('b_color_card', '/assets/blue_color_card');
-    this.load.image('y_color_card', '/assets/yellow_color_card');
-    this.load.image('g_color_card', '/assets/green_color_card');
+  this.load.image('choose_color_board', '/assets/choose_color_board');
+  this.load.image('r_color_card', '/assets/red_color_card');
+  this.load.image('b_color_card', '/assets/blue_color_card');
+  this.load.image('y_color_card', '/assets/yellow_color_card');
+  this.load.image('g_color_card', '/assets/green_color_card');
 
-    this.load.image('r_direction', '/assets/direction');
-    this.load.image('l_direction', '/assets/direction2');
+  this.load.image('r_direction', '/assets/direction');
+  this.load.image('l_direction', '/assets/direction2');
 
-    this.load.image('bomb', '/assets/bomb');
+  this.load.image('bomb', '/assets/bomb');
 
+  // load audio
+  this.load.audio('card_sound', '/assets/taking_card_sound');
+  this.load.audio('bomb_sound', '/assets/bomb_sound');
 }
 
 var sprite;
@@ -163,6 +170,9 @@ var direction_text;
 var bomb;
 var bomb_text;
 
+var bomb_sound;
+var card_sound;
+
 var socket_id;
 
 function create ()
@@ -188,6 +198,10 @@ function create ()
 
   // ----- start
   game.socket.on('start', function(){
+
+    // ----- set sounds
+    // card_sound = _this.sound.add('card_sound');
+    // bomb_sound = _this.sound.add('bomb_sound');
 
     // ----- set background
     _this.add.image(550,300,'background');
@@ -215,7 +229,6 @@ function create ()
     dummy.inputEnabled = true;
 
     dummy.on('pointerup', function(pointer){
-
       // ----- get dummy length
       game.socket.emit('get_dummy_length',room_num, user_num, 1);
     });
@@ -310,36 +323,32 @@ function create ()
     refresh_cards(_this);
   });
 
-  // ----- get dummy and set dummy
-  game.socket.on('set_dummy1', function(length, _turn){
-
+  // ----- set dummy
+  game.socket.on('set_dummy', function(length, _turn){
     if(user_num == _turn){
-      if(length > 0){
-        if(length == 1){
-          dummy.setTexture('back_card');
-        }
-        game.socket.emit('pointerup_dummy',room_num, user_num);
+      game.socket.emit('pointerup_dummy',room_num, user_num);
+
+      if(length == 1){
+        // dummy add the field cards
+        game.socket.emit('dummy_add_field_cards',room_num);
       }
-      else{
-        dummy.destroy();
+      else if(length == 2){
+        dummy.setTexture('back_card');
       }
+
     }
-  
+
   });
 
-  // ----- refresh dummy
-  game.socket.on('set_dummy2', function(length, _turn){
-
-    if(user_num == _turn){
-      if(length > 0){
-        if(length == 1){
-          dummy.setTexture('back_card');
-        }
-      }
-      else{
-        dummy.destroy();
-      }
+  // ----- get dummy
+  game.socket.on('get_dummy', function(length){
+    if(length == 1){
+      dummy.setTexture('back_card');
     }
+    else{
+      dummy.setTexture('card_dummy');
+    }
+    
   });
 
   // ----- set_text_info (player)
@@ -458,6 +467,7 @@ function create ()
 
     console.log("set player nums");
     console.log("player_arr : "+player_arr);
+    console.log("_turn : " + _turn);
 
     // --- setting direction
     if(_dir == 0){ // 반시계 방향 ( + )
@@ -518,7 +528,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 2;
+        index = 1;
       }
 
 
@@ -564,7 +574,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 3;
+        index = 2;
       }
       
       if(player_arr[index] == '1'){
@@ -608,7 +618,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 3;
+        index = 2;
       }
       
       if(player_arr[index] == '1'){
@@ -654,7 +664,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 4;
+        index = 3;
       }
       
       if(player_arr[index] == '1'){
@@ -698,7 +708,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 4;
+        index = 3;
       }
       
       if(player_arr[index] == '1'){
@@ -741,7 +751,7 @@ function create ()
         index = 0;
       }
       else if(index == -1){
-        index = 4;
+        index = 3;
       }
       
       if(player_arr[index] == '1'){
@@ -799,20 +809,55 @@ function create ()
       game_direction = _this.add.image(590,290,direction_img).setInteractive();
     }
     else if(_num == 2){
-      // num 1 
-      player_num1.setTexture(player1_num_img);
-          
-      // num 2
-      if (user_count > 2){
-        player_num2.setTexture(player2_num_img);
+      if(_dir == 0){ // 반시계 방향 ( + )
+        // num 1 
+        player_num1.setTexture(player1_num_img);
+            
+        // num 2
+        if(user_count > 2){
+          player_num2.setTexture(player2_num_img);
+        }
+            
+        // num 3
+        player_num3.setTexture(player3_num_img);
+            
+        // num 4
+        if(user_count == 4){
+          player_num4.setTexture(player4_num_img);
+        }
       }
-          
-      // num 3
-      player_num3.setTexture(player3_num_img);
-          
-      // num 4
-      if (user_count == 4){
-        player_num4.setTexture(player4_num_img);
+      else if(_dir == 1){ // 시계 방향 ( - )
+        if(user_count == 2){
+          // num 1 
+          player_num1.setTexture(player1_num_img);
+
+          // num 3
+          player_num3.setTexture(player3_num_img);
+        }
+        else if(user_count == 3){
+          // num 1 
+          player_num1.setTexture(player1_num_img);
+
+          // num 2
+          player_num2.setTexture(player3_num_img);
+
+          // num 3
+          player_num3.setTexture(player2_num_img);
+        }
+        else if(user_count == 4){
+          // num 1 
+          player_num1.setTexture(player1_num_img);
+
+          // num 2
+          player_num2.setTexture(player4_num_img);
+
+          // num 3
+          player_num3.setTexture(player3_num_img);
+
+          // num 4
+          player_num4.setTexture(player2_num_img);
+        }
+
       }
 
       game_direction.setTexture(direction_img);
@@ -1197,24 +1242,20 @@ function create ()
             if(i < 11){
               var sprite = sprite2.create(815,340-i*20,'other_card')
               sprite.angle += 270;
-              sprite.name = i;
             }
             else if(i == 11){
               var sprite = sprite2.create(815,340-i*20,'other_card')
               sprite.angle += 270;
-              sprite.name = i;
             }
           }
           else if(player_arr.length > 12){
             if(i < 11){
               var sprite = sprite2.create(815,340-i*20,'other_card')
               sprite.angle += 270;
-              sprite.name = i;
             }
             else if(i == 11){
               var sprite = sprite2.create(815,340-i*20,'p_other_card')
               sprite.angle += 270;
-              sprite.name = i;
             }
             else if(i > 11){
               break;
@@ -1233,24 +1274,20 @@ function create ()
             if(i < 11){
               var sprite = sprite3.create(547-i*20,73,'other_card')
               sprite.angle += 180;
-              sprite.name = i;
             }
             else if(i == 11){
               var sprite = sprite3.create(547-i*20,73,'other_card')
               sprite.angle += 180;
-              sprite.name = i;
             }
           }
           else if(player_arr.length > 12){
             if(i < 11){
               var sprite = sprite3.create(547-i*20,73,'other_card')
               sprite.angle += 180;
-              sprite.name = i;
             }
             else if(i == 11){
               var sprite = sprite3.create(547-i*20,73,'p_other_card')
               sprite.angle += 180;
-              sprite.name = i;
             }
             else if(i > 11){
               break;
@@ -1269,24 +1306,20 @@ function create ()
           if(i < 11){
             var sprite = sprite4.create(85,334-i*20,'other_card')
             sprite.angle += 90;
-            sprite.name = i;
           }
           else if(i == 11){
             var sprite = sprite4.create(85,334-i*20,'other_card')
             sprite.angle += 90;
-            sprite.name = i;
           }
         }
         else if(player_arr.length > 12){
           if(i < 11){
             var sprite = sprite4.create(85,334-i*20,'other_card')
             sprite.angle += 90;
-            sprite.name = i;
           }
           else if(i == 11){
             var sprite = sprite4.create(85,334-i*20,'p_other_card')
             sprite.angle += 90;
-            sprite.name = i;
           }
           else if(i > 11){
             break;

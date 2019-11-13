@@ -2,8 +2,10 @@
 
 var express = require('express');
 var app = express();
-var routes = require('./img_routes'); // img routers
-app.use('/',routes);
+var img_routes = require('./img_routes'); // image routers
+var sound_routrs = require('./sound_routes'); // sound routers
+app.use('/',img_routes);
+app.use('/',sound_routrs);
 
 var http = require('http').Server(app); 
 var io = require('socket.io')(http);    
@@ -329,16 +331,17 @@ io.on('connection', function(socket){
       for(var i = 0; i < g_bomb_cnt[r_num]; i++){
         k = parseInt(Math.random()*g_dummy_cards[r_num].length);
         temp.push(g_dummy_cards[r_num][k]);
+        g_dummy_cards[r_num].splice(k,1);
       }
       g_player_cards[r_num][index] = temp.join('/');
-      g_dummy_cards[r_num].splice(k,1);
-
       g_bomb_cnt[r_num] = 0; // reset
+      
     }
     else{ // bomb count == 0
       temp.push(g_dummy_cards[r_num][k]);
-      g_player_cards[r_num][index] = temp.join('/');
       g_dummy_cards[r_num].splice(k,1);
+      g_player_cards[r_num][index] = temp.join('/');
+
     }
 
     // turn setting
@@ -371,6 +374,28 @@ io.on('connection', function(socket){
 
   });
 
+  socket.on('dummy_add_field_cards',function(r_num){
+    var k;
+    var temp = g_field_card[r_num][g_field_card[r_num].length - 1]; // except the last index( real field card )
+    
+    console.log('before dummy : ' + g_dummy_cards[r_num]);
+    console.log('before field : ' + g_field_card[r_num]);
+    
+    g_field_card[r_num].splice(g_field_card[r_num].length - 1,1);
+
+    for(var i = 0; i < g_field_card[r_num].length - 1; i++){
+      k = parseInt(Math.random()*g_field_card[r_num].length);
+      g_dummy_cards[r_num].push(g_field_card[r_num][k]); // push the field value
+    }
+    
+    g_field_card[r_num].splice(0, g_field_card[r_num].length); // remove all value
+    g_field_card[r_num].push(temp); // push last one
+
+    console.log('after dummy : ' + g_dummy_cards[r_num]);
+    console.log('after field : ' + g_field_card[r_num]);
+
+  });
+
   socket.on('get_dummy_length', function(r_num, u_num, num){
     
     // num == 1 : get dummy card
@@ -379,10 +404,10 @@ io.on('connection', function(socket){
     var turn = g_turn_is[r_num];
     
     if(num == 1){
-      io.to(g_user_socketID[r_num][index]).emit('set_dummy1', g_dummy_cards[r_num].length, turn);
+      io.to(g_user_socketID[r_num][index]).emit('set_dummy', g_dummy_cards[r_num].length, turn);
     }
     else if(num == 2){
-      io.to(g_user_socketID[r_num][index]).emit('set_dummy2', g_dummy_cards[r_num].length, turn);
+      io.to(g_user_socketID[r_num][index]).emit('get_dummy', g_dummy_cards[r_num].length);
     }
 
   });
@@ -532,10 +557,11 @@ io.on('connection', function(socket){
       }
 
       g_turn_is[r_num] = g_user_num[r_num][index];
-    }
+      console.log("g_turn_is[r_num] : " + g_turn_is[r_num]);
 
-    for(var i = 0; i < g_user_socketID[r_num].length; i++){
-      io.to(g_user_socketID[r_num][i]).emit('refresh');
+      for(var i = 0; i < g_user_socketID[r_num].length; i++){
+        io.to(g_user_socketID[r_num][i]).emit('refresh');
+      }
     }
 
   });
