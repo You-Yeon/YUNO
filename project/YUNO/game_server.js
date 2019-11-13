@@ -383,9 +383,10 @@ io.on('connection', function(socket){
     
     g_field_card[r_num].splice(g_field_card[r_num].length - 1,1);
 
+    // push the field value
     for(var i = 0; i < g_field_card[r_num].length - 1; i++){
       k = parseInt(Math.random()*g_field_card[r_num].length);
-      g_dummy_cards[r_num].push(g_field_card[r_num][k]); // push the field value
+      g_dummy_cards[r_num].push(g_field_card[r_num][k]);
     }
     
     g_field_card[r_num].splice(0, g_field_card[r_num].length); // remove all value
@@ -412,9 +413,9 @@ io.on('connection', function(socket){
 
   });
 
-  socket.on('get_field_card', function(r_num, _num){
+  socket.on('get_field_card', function(r_num){
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
-      io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1], _num);
+      io.to(g_user_socketID[r_num][i]).emit('set_field_card', g_field_card[r_num][g_field_card[r_num].length-1]);
     }
 
   });
@@ -476,91 +477,120 @@ io.on('connection', function(socket){
 
   socket.on('play_a_card', function(r_num, u_num, _index){
 
-    console.log("r_num :" +  r_num);
-    console.log("u_num :" + u_num);
-    console.log("g_player_cards :" + g_player_cards);
-    var index = g_user_num[r_num].indexOf(u_num);
-    var temp = g_player_cards[r_num][index].split('/');
+    console.log("_index :" + _index);
 
-    if(temp[_index]){ // When player have the card
+    var index = g_user_num[r_num].indexOf(u_num);
+    var temp;
+    var temp_split;
+
+    // *** step2 change color card
+    if(_index == 'y_color' || _index == 'r_color' || _index == 'g_color' || _index == 'b_color'){
+      temp = _index;
+      temp_split = _index.split("_"); 
+    }
+    else{ // if not change color card _index is index
+      temp = g_player_cards[r_num][index].split('/');
+      temp_split = temp[_index].split("_"); // find value
+    }
+
+    if(temp[_index] || _index == 'y_color' || _index == 'r_color' || _index == 'g_color' || _index == 'b_color'){ // When player have the card
       console.log("temp[_index] :" + temp[_index]);
 
-      var temp_split = temp[_index].split("_");
+      // when player card is change color card
+      if(temp_split[1] == 'c'){ // *** step1 change color card
+        // set cards
+        temp.splice(_index,1);
+        g_player_cards[r_num][index] = temp.join('/');
+        
+        io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, '0_0', 0, 0); // block player cards
+        io.to(g_user_socketID[r_num][index]).emit('show_change_color_board');
 
-      // when player card is plus card
-      if(temp_split[1] == 'p'){
-        if(temp_split[0] == '4'){ // plus 4 card
-          g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 4;
-        }
-        else{ // plus 2 card
-          g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 2;
-        }
       }
+      else{
+        // when player card is plus card
+        if(temp_split[1] == 'p'){
+          if(temp_split[0] == '4'){ // plus 4 card
+            g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 4;
+          }
+          else{ // plus 2 card
+            g_bomb_cnt[r_num] = g_bomb_cnt[r_num] + 2;
+          }
+        }
+  
+        if(temp_split[1] == 'color'){ // *** step3 change color card
+          // push the field card
+          g_field_card[r_num].push(temp);
 
-      // get card and push the field card
-      g_field_card[r_num].push(temp[_index]);
-      temp.splice(_index,1);
-      g_player_cards[r_num][index] = temp.join('/');
+        }
+        else{
+          // set cards and push the field card
+          g_field_card[r_num].push(temp[_index]);
+          temp.splice(_index,1);
+          g_player_cards[r_num][index] = temp.join('/');
 
-      // turn setting
-      var direction;
-      var index;
+        }
 
-      // when player card is arrow card
-      if(temp_split[1] == 'r'){
+        // turn setting
+        var direction;
+        var index;
+  
+        // when player card is arrow card
+        if(temp_split[1] == 'r'){
+          if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
+            g_direction_is[r_num] = 1;
+          }
+          else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
+            g_direction_is[r_num] = 0;
+          }
+        }
+  
+        // --- setting direction
         if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
-          g_direction_is[r_num] = 1;
+          direction = 1;
         }
         else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
-          g_direction_is[r_num] = 0;
+          direction = -1;
         }
-      }
-
-      // --- setting direction
-      if(g_direction_is[r_num] == 0){ // 반시계 방향 ( + )
-        direction = 1;
-      }
-      else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
-        direction = -1;
-      }
-      
-      // --- find index
-      index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
-
-      // when player card is ban card
-      if(temp_split[1] == 'b'){
-        index += direction*2;
-
-        if(index == g_user_num[r_num].length){
-          index = 0;
+        
+        // --- find index
+        index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
+  
+        // when player card is ban card
+        if(temp_split[1] == 'b'){
+          index += direction*2;
+  
+          if(index == g_user_num[r_num].length){
+            index = 0;
+          }
+          else if(index == -1){
+            index = g_user_num[r_num].length - 1;
+          }
+          else if(index == g_user_num[r_num].length + 1){
+            index = 1;
+          }
+          else if(index == -2){
+            index = g_user_num[r_num].length - 2;
+          }
+  
         }
-        else if(index == -1){
-          index = g_user_num[r_num].length - 1;
+        else{ // or not ban card
+          index += direction;
+  
+          if(index == g_user_num[r_num].length){
+            index = 0;
+          }
+          else if(index == -1){
+            index = g_user_num[r_num].length - 1;
+          }
         }
-        else if(index == g_user_num[r_num].length + 1){
-          index = 1;
-        }
-        else if(index == -2){
-          index = g_user_num[r_num].length - 2;
+  
+        g_turn_is[r_num] = g_user_num[r_num][index];
+        console.log("g_turn_is[r_num] : " + g_turn_is[r_num]);
+  
+        for(var i = 0; i < g_user_socketID[r_num].length; i++){
+          io.to(g_user_socketID[r_num][i]).emit('refresh');
         }
 
-      }
-      else{ // or not ban card
-        index += direction;
-
-        if(index == g_user_num[r_num].length){
-          index = 0;
-        }
-        else if(index == -1){
-          index = g_user_num[r_num].length - 1;
-        }
-      }
-
-      g_turn_is[r_num] = g_user_num[r_num][index];
-      console.log("g_turn_is[r_num] : " + g_turn_is[r_num]);
-
-      for(var i = 0; i < g_user_socketID[r_num].length; i++){
-        io.to(g_user_socketID[r_num][i]).emit('refresh');
       }
     }
 

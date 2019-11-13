@@ -124,10 +124,10 @@ function preload ()
   this.load.image('f_num_yuno', '/assets/focus_yuno_num_button');
 
   this.load.image('choose_color_board', '/assets/choose_color_board');
-  this.load.image('r_color_card', '/assets/red_color_card');
-  this.load.image('b_color_card', '/assets/blue_color_card');
-  this.load.image('y_color_card', '/assets/yellow_color_card');
-  this.load.image('g_color_card', '/assets/green_color_card');
+  this.load.image('r_color', '/assets/red_color_card');
+  this.load.image('b_color', '/assets/blue_color_card');
+  this.load.image('y_color', '/assets/yellow_color_card');
+  this.load.image('g_color', '/assets/green_color_card');
 
   this.load.image('r_direction', '/assets/direction');
   this.load.image('l_direction', '/assets/direction2');
@@ -139,33 +139,43 @@ function preload ()
   this.load.audio('bomb_sound', '/assets/bomb_sound');
 }
 
-var sprite;
-var sprite1;
+var sprite; // player card images
+var sprite1; // other player card images.. 
 var sprite2;
 var sprite3;
 var sprite4;
 
-var total_card;
+var color_board_sprite; // change color sprites.. 
+var color_board;
+var y_color;
+var r_color;
+var g_color;
+var b_color;
+
+var total_card; // cards..
 var field_card;
 var dummy;
-var yuno_button;
-var player_num1;
+
+var yuno_button; // yuno button..
+
+var player_num1; // player num..
 var player_num2;
 var player_num3;
 var player_num4;
-var game_direction;
 
 var player1_num_img;
 var player2_num_img;
 var player3_num_img;
 var player4_num_img;
-var direction_img;
 
-var user_text1;
+var user_text1; // texts..
 var user_text2;
 var user_text3;
 var user_text4;
 var direction_text;
+
+var game_direction;
+var direction_img;
 
 var bomb;
 var bomb_text;
@@ -291,14 +301,10 @@ function create ()
     }
 
     //----- field_card
-
+    field_card = _this.add.image(380,250,'back_card');
+    
     // get_field_card
-    game.socket.emit('get_field_card',room_num, 1);
-
-    // set_field_card
-    game.socket.on('set_field_card', function(_field_card){
-      field_card = _this.add.image(380,250,_field_card).setInteractive();
-    });
+    game.socket.emit('get_field_card',room_num);
 
     // ----- set player nums and direction
     game.socket.emit('get_player_nums',room_num, user_num, 1);
@@ -314,6 +320,86 @@ function create ()
     yuno_button.on('pointerdown', function(pointer){
       yuno_button.setTexture('yuno_button_off');
       player_num1.setTexture('num_yuno');
+    });
+
+    // ----- set color board
+    color_board_sprite = _this.add.group();
+    color_board = color_board_sprite.create(450, 260, 'choose_color_board')
+    y_color = color_board_sprite.create(300, 280, 'y_color').setInteractive();
+    r_color = color_board_sprite.create(400, 280, 'r_color').setInteractive();
+    g_color = color_board_sprite.create(500, 280, 'g_color').setInteractive();
+    b_color = color_board_sprite.create(600, 280, 'b_color').setInteractive();
+
+    color_board_sprite.inputEnabled = false;
+    color_board.visible = false;
+    y_color.visible = false;
+    r_color.visible = false;
+    g_color.visible = false;
+    b_color.visible = false;
+
+    y_color.on('pointerup', function(pointer){
+      color_board_sprite.inputEnabled = false;
+      color_board.visible = false;
+      y_color.visible = false;
+      r_color.visible = false;
+      g_color.visible = false;
+      b_color.visible = false;
+
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+
+      // ----- play a card
+      game.socket.emit('play_a_card',room_num, user_num, "y_color");
+
+    });
+    r_color.on('pointerup', function(pointer){
+      color_board_sprite.inputEnabled = false;
+      color_board.visible = false;
+      y_color.visible = false;
+      r_color.visible = false;
+      g_color.visible = false;
+      b_color.visible = false;
+
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+
+      // ----- play a card
+      game.socket.emit('play_a_card',room_num, user_num, "r_color");
+
+    });
+    g_color.on('pointerup', function(pointer){
+      color_board_sprite.inputEnabled = false;
+      color_board.visible = false;
+      y_color.visible = false;
+      r_color.visible = false;
+      g_color.visible = false;
+      b_color.visible = false;
+      
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+      
+      // ----- play a card
+      game.socket.emit('play_a_card',room_num, user_num, "g_color");
+
+    });
+    b_color.on('pointerup', function(pointer){
+      color_board_sprite.inputEnabled = false;
+      color_board.visible = false;
+      y_color.visible = false;
+      r_color.visible = false;
+      g_color.visible = false;
+      b_color.visible = false;
+
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+
+      // ----- play a card
+      game.socket.emit('play_a_card',room_num, user_num, "b_color");
+
     });
 
   });
@@ -1330,17 +1416,23 @@ function create ()
   });
 
   // ----- set_field_card
-  game.socket.on('set_field_card', function(_field_card, _num){
-
-    // num == 1 : create player nums
-    // num == 2 : refresh player nums
-    
-    if(_num == 1){
-      field_card = _this.add.image(380,250,_field_card).setInteractive();
-    }
-    else if(_num == 2){
+  game.socket.on('set_field_card', function(_field_card){
       field_card.setTexture(_field_card);
-    }
+  });
+
+  // ----- show change color board
+  game.socket.on('show_change_color_board', function(){
+    color_board_sprite.inputEnabled = true;
+    color_board.visible = true;
+    y_color.visible = true;
+    r_color.visible = true;
+    g_color.visible = true;
+    b_color.visible = true;
+    
+    field_card.visible = false;
+    game_direction.visible = false;
+    dummy.visible = false;
+
   });
 }
 
@@ -1393,6 +1485,9 @@ function refresh_cards(_this){
   //----- dummy
   game.socket.emit('get_dummy_length',room_num, user_num, 2);
 
+  // ----- field_card
+  game.socket.emit('get_field_card',room_num, 2);
+
   //----- player_cards
 
   // player1
@@ -1411,11 +1506,9 @@ function refresh_cards(_this){
     other_card(_this,4);
   }
 
-  // ----- field_card
-  game.socket.emit('get_field_card',room_num, 2);
-
   // ----- bomb
   game.socket.emit('get_bomb_count',room_num);
+
 }
 
 function update(){
