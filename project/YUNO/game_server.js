@@ -376,21 +376,52 @@ io.on('connection', function(socket){
 
   socket.on('dummy_add_field_cards',function(r_num){
     var k;
-    var temp = g_field_card[r_num][g_field_card[r_num].length - 1]; // except the last index( real field card )
-    
+    var field_last_card = g_field_card[r_num][g_field_card[r_num].length - 1]; // except the last index( real field card )
+    var field_length = g_field_card[r_num].length - 1;
     console.log('before dummy : ' + g_dummy_cards[r_num]);
     console.log('before field : ' + g_field_card[r_num]);
     
     g_field_card[r_num].splice(g_field_card[r_num].length - 1,1);
 
+    // remove color cards
+    var color_chk;
+
+    // yellow color card
+    color_chk = g_field_card[r_num].indexOf('y_color');
+    while(color_chk != -1){ // find yellow color card
+      g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+      color_chk = g_field_card[r_num].indexOf('y_color');
+    }
+
+    // red color card
+    color_chk = g_field_card[r_num].indexOf('r_color');
+    while(color_chk != -1){ // find red color card
+      g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+      color_chk = g_field_card[r_num].indexOf('r_color');
+    }
+
+    // green color card
+    color_chk = g_field_card[r_num].indexOf('g_color');
+    while(color_chk != -1){ // find green color card
+      g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+      color_chk = g_field_card[r_num].indexOf('g_color');
+    }
+
+    // blue color card
+    color_chk = g_field_card[r_num].indexOf('b_color');
+    while(color_chk != -1){ // find blue color card 
+      g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+      color_chk = g_field_card[r_num].indexOf('b_color');
+    }
+
     // push the field value
-    for(var i = 0; i < g_field_card[r_num].length - 1; i++){
+    for(var i = 0; i < field_length; i++){
       k = parseInt(Math.random()*g_field_card[r_num].length);
       g_dummy_cards[r_num].push(g_field_card[r_num][k]);
+      g_field_card[r_num].splice(k, 1); // remove all value
     }
     
-    g_field_card[r_num].splice(0, g_field_card[r_num].length); // remove all value
-    g_field_card[r_num].push(temp); // push last one
+    g_field_card[r_num].push(field_last_card); // push last one
 
     console.log('after dummy : ' + g_dummy_cards[r_num]);
     console.log('after field : ' + g_field_card[r_num]);
@@ -425,8 +456,30 @@ io.on('connection', function(socket){
 
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       io.to(g_user_socketID[r_num][i]).emit('set_bomb', bomb_cnt);
-    }0
+    }
 
+  });
+  
+  socket.on('yuno_button_pointerdown', function(r_num, u_num){
+    var index = g_user_num[r_num].indexOf(u_num);
+
+    // set player nums
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      if(i != index){
+        io.to(g_user_socketID[r_num][i]).emit('', );
+      }
+    }
+  });
+
+  socket.on('yuno_button_pointerup', function(r_num, u_num){
+    var index = g_user_num[r_num].indexOf(u_num);
+
+    // set player nums
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      if(i != index){
+        io.to(g_user_socketID[r_num][i]).emit('', );
+      }
+    }
   });
 
   socket.on('get_player_info', function(r_num, u_num){
@@ -436,8 +489,9 @@ io.on('connection', function(socket){
     var field = g_field_card[r_num][g_field_card[r_num].length-1];
     var bombs = g_bomb_cnt[r_num];
     var turn = g_turn_is[r_num];
+    var d_length = g_dummy_cards[r_num].length;
 
-    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, field, bombs, turn);
+    io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, field, bombs, turn, d_length);
 
   });
 
@@ -502,8 +556,11 @@ io.on('connection', function(socket){
         temp.splice(_index,1);
         g_player_cards[r_num][index] = temp.join('/');
         
-        io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, '0_0', 0, 0); // block player cards
-        io.to(g_user_socketID[r_num][index]).emit('show_change_color_board');
+        io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, '0_0', 0, 0, 0); // block player cards
+        io.to(g_user_socketID[r_num][index]).emit('show_change_color_board'); // show the change color board
+        for(var i = 0; i < g_user_socketID[r_num].length; i++){ // set the color board state
+          io.to(g_user_socketID[r_num][i]).emit('set_color_board_state', 1);
+        }
 
       }
       else{
@@ -521,6 +578,9 @@ io.on('connection', function(socket){
           // push the field card
           g_field_card[r_num].push(temp);
 
+          for(var i = 0; i < g_user_socketID[r_num].length; i++){ // set the color board state
+            io.to(g_user_socketID[r_num][i]).emit('set_color_board_state', 0);
+          }
         }
         else{
           // set cards and push the field card
@@ -528,6 +588,61 @@ io.on('connection', function(socket){
           temp.splice(_index,1);
           g_player_cards[r_num][index] = temp.join('/');
 
+        }
+
+        if(g_dummy_cards[r_num].length == 0 && g_field_card[r_num].length > 1){
+          // 'dummy_add_field_cards'
+
+          var k;
+          var _field_last_card = g_field_card[r_num][g_field_card[r_num].length - 1]; // except the last index( real field card )
+          var _field_length = g_field_card[r_num].length - 1;
+          console.log('before dummy : ' + g_dummy_cards[r_num]);
+          console.log('before field : ' + g_field_card[r_num]);
+            
+          g_field_card[r_num].splice(g_field_card[r_num].length - 1,1);
+        
+          // remove color cards
+          var color_chk;
+
+          // yellow color card
+          color_chk = g_field_card[r_num].indexOf('y_color');
+          while(color_chk != -1){ // find yellow color card
+            g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+            color_chk = g_field_card[r_num].indexOf('y_color');
+          }
+
+          // red color card
+          color_chk = g_field_card[r_num].indexOf('r_color');
+          while(color_chk != -1){ // find red color card
+            g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+            color_chk = g_field_card[r_num].indexOf('r_color');
+          }
+
+          // green color card
+          color_chk = g_field_card[r_num].indexOf('g_color');
+          while(color_chk != -1){ // find green color card
+            g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+            color_chk = g_field_card[r_num].indexOf('g_color');
+          }
+
+          // blue color card
+          color_chk = g_field_card[r_num].indexOf('b_color');
+          while(color_chk != -1){ // find blue color card 
+            g_field_card[r_num].splice(color_chk, 1, "c_c") // change 'color card' to 'change card'
+            color_chk = g_field_card[r_num].indexOf('b_color');
+          }
+          
+          // push the field value
+          for(var i = 0; i < _field_length; i++){
+            k = parseInt(Math.random()*g_field_card[r_num].length);
+            g_dummy_cards[r_num].push(g_field_card[r_num][k]);
+            g_field_card[r_num].splice(k, 1); // remove all value
+          }
+            
+          g_field_card[r_num].push(_field_last_card); // push last one
+        
+          console.log('after dummy : ' + g_dummy_cards[r_num]);
+          console.log('after field : ' + g_field_card[r_num]);
         }
 
         // turn setting

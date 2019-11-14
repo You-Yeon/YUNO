@@ -145,6 +145,7 @@ var sprite2;
 var sprite3;
 var sprite4;
 
+var color_board_state = 0; // 0 : not choose time, 1 : choose time
 var color_board_sprite; // change color sprites.. 
 var color_board;
 var y_color;
@@ -314,12 +315,20 @@ function create ()
     yuno_button.inputEnabled = true;
     
     yuno_button.on('pointerup', function(pointer){
-      yuno_button.setTexture('yuno_button_on');
-      player_num1.setTexture('num_1');
+      if(color_board_state == 0){ // not choose color time
+        yuno_button.setTexture('yuno_button_on');
+        player_num1.setTexture(player1_num_img);
+
+        game.socket.emit('yuno_button_pointerup',room_num, user_num);
+      }
     });
     yuno_button.on('pointerdown', function(pointer){
-      yuno_button.setTexture('yuno_button_off');
-      player_num1.setTexture('num_yuno');
+      if(color_board_state == 0){ // not choose color time
+        yuno_button.setTexture('yuno_button_off');
+        player_num1.setTexture('num_yuno');
+
+        game.socket.emit('yuno_button_pointerdown',room_num, user_num);
+      }
     });
 
     // ----- set color board
@@ -345,6 +354,7 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
 
+      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -361,6 +371,7 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
 
+      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -377,6 +388,7 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
       
+      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -393,6 +405,7 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
 
+      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -428,10 +441,17 @@ function create ()
 
   // ----- get dummy
   game.socket.on('get_dummy', function(length){
-    if(length == 1){
+    console.log("dummy length :" + length);
+
+    if(length == 0){
+      dummy.visible = false;
+    }
+    else if(length == 1){
+      dummy.visible = true;
       dummy.setTexture('back_card');
     }
     else{
+      dummy.visible = true;
       dummy.setTexture('card_dummy');
     }
     
@@ -952,7 +972,7 @@ function create ()
   });
 
   // ----- set_player_info
-  game.socket.on('set_player_info', function(player_arr, _field, _bombs, _turn){
+  game.socket.on('set_player_info', function(player_arr, _field, _bombs, _turn, _d_length){
 
     sprite1.clear(_this);
     // sprite1.destroy();
@@ -978,7 +998,7 @@ function create ()
         temp_split = player_arr[i].split("_");
         
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
+          if(_bombs > 0){ // bomb count > 0     
             if(temp_split[1] == 'p'){ // player can play a bomb card
               sprite.on('pointerover', function(event){
                 this.y -=70;
@@ -1433,6 +1453,11 @@ function create ()
     game_direction.visible = false;
     dummy.visible = false;
 
+  });
+
+  // ----- set the color board state
+  game.socket.on('set_color_board_state', function(state){
+    color_board_state = state;
   });
 }
 
