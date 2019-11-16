@@ -35,6 +35,7 @@ var g_text_info_num = new Array(new Array());
 var g_text_info_name = new Array(new Array());
 var g_turn_is = new Array(); // who turn?
 var g_direction_is = new Array(); // what direction?
+var g_yuno_state = new Array(new Array()); // 0 : not shield, 1: shield
 var g_bomb_cnt = new Array();
 
 var g_name;
@@ -90,6 +91,7 @@ app.post('/',function(req, res){
     g_field_card[room_count] = new Array();
     g_text_info_num[room_count] = new Array();
     g_text_info_name[room_count] = new Array();
+    g_yuno_state[room_count] = new Array();
   }
 
   // set cookie
@@ -103,12 +105,18 @@ app.post('/',function(req, res){
     g_user_name[room_count].push(g_name);
     g_user_num[room_count].push(g_num);
     g_user_state[room_count].push(g_state);
+    
+    // setting yuno state
+    g_yuno_state[room_count].push(0);
   }
   else{
 
     g_user_name[room_count].push(g_name);
     g_user_num[room_count].push(g_num);
     g_user_state[room_count].push(g_state);
+    
+    // setting yuno state
+    g_yuno_state[room_count].push(0);
 
     room_count++;
   }
@@ -250,8 +258,8 @@ var ArraySort = function(room_num){
   console.log("F g_user_state : " + g_user_state);
   console.log("F g_user_socketID_check : " + g_user_socketID_check);
   console.log("F g_user_socketID : " + g_user_socketID);
-
-  console.log("g_bomb_cnt : "+ g_bomb_cnt);
+  console.log("F g_yuno_state : " + g_yuno_state);
+  console.log("F g_bomb_cnt : "+ g_bomb_cnt);
 }
 
 io.on('connection', function(socket){
@@ -259,7 +267,7 @@ io.on('connection', function(socket){
   //push socket_id
   io.to(socket.id).emit('push_socket_id', socket.id);
 
-  //push values 
+  //push socket id values 
   if(Array.isArray(g_user_socketID_check[room_count - 1])){
     g_user_socketID_check[room_count - 1].push(socket.id);
     g_user_socketID[room_count - 1].push('0');
@@ -354,7 +362,10 @@ io.on('connection', function(socket){
     else if(g_direction_is[r_num] == 1){ // 시계 방향 ( - )
       direction = -1;
     }
-          
+    
+    // --- set shield
+    g_yuno_state[r_num][index] = 0; // get shield
+
     // --- find index
     index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
     index += direction;
@@ -462,22 +473,70 @@ io.on('connection', function(socket){
   
   socket.on('yuno_button_pointerdown', function(r_num, u_num){
     var index = g_user_num[r_num].indexOf(u_num);
+    var turn = g_turn_is[r_num];
+    var dir = g_direction_is[r_num];
+    var temp;
+    var cnt = 0;
+
+    // set shield
+    temp = g_player_cards[r_num][index].split('/');
+    if(temp.length == 1){
+      g_yuno_state[r_num][index] = 1; // get shield
+      cnt = 1;
+    }
+
+    // check attack
+    for(var i = 0; i < g_user_name[r_num].length; i++){
+      if(i != index){
+        temp = g_player_cards[r_num][i].split('/');
+        if(temp.length == 1 && g_yuno_state[r_num][i] == 0){
+          for(var j = 0; j < 2; j++){
+            k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+            temp.push(g_dummy_cards[r_num][k]);
+            g_dummy_cards[r_num].splice(k,1);
+          }
+          g_player_cards[r_num][i] = temp.join('/');
+          
+          cnt = 1;
+        }
+      }
+    }
+
+    // if not shield and not attack, just mistake
+    if(cnt == 0){
+      temp = g_player_cards[r_num][index].split('/');
+      for(var j = 0; j < 2; j++){
+        k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+        temp.push(g_dummy_cards[r_num][k]);
+        g_dummy_cards[r_num].splice(k,1);
+      }
+      g_player_cards[r_num][index] = temp.join('/');
+    }
+
+    //refresh only player cards
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('refresh_only_player_cards');
+    }
 
     // set player nums
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       if(i != index){
-        io.to(g_user_socketID[r_num][i]).emit('', );
+        io.to(g_user_socketID[r_num][i]).emit('set_the_other_yuno_num', 1, u_num, turn, dir);
       }
     }
   });
 
   socket.on('yuno_button_pointerup', function(r_num, u_num){
     var index = g_user_num[r_num].indexOf(u_num);
+    var dir = g_direction_is[r_num];
 
     // set player nums
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      if(i == index){
+        io.to(g_user_socketID[r_num][i]).emit('set_player_yuno_state', 1); // set the player yuno state = 1
+      }
       if(i != index){
-        io.to(g_user_socketID[r_num][i]).emit('', );
+        io.to(g_user_socketID[r_num][i]).emit('set_the_other_yuno_num', 0, u_num, 0, dir);
       }
     }
   });

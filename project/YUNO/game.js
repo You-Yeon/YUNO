@@ -21,7 +21,7 @@ var config = {
     width: 1300,
     height: 600,
     audio: {
-      disableWebAudio: true
+      noAudio: true
     },
     physics : {
       default: 'arcade',
@@ -135,8 +135,8 @@ function preload ()
   this.load.image('bomb', '/assets/bomb');
 
   // load audio
-  this.load.audio('card_sound', '/assets/taking_card_sound');
-  this.load.audio('bomb_sound', '/assets/bomb_sound');
+  this.load.audio('card_sound', ['assets/taking_card_sound.mp3','assets/taking_card_sound.ogg']);
+  this.load.audio('bomb_sound', ['assets/bomb_sound.mp3', 'assets/bomb_sound.ogg']);
 }
 
 var sprite; // player card images
@@ -146,6 +146,8 @@ var sprite3;
 var sprite4;
 
 var color_board_state = 0; // 0 : not choose time, 1 : choose time
+var player_yuno_state = 0; // 0 : player can push the yuno button, 1 : player can't push the yuno button 
+
 var color_board_sprite; // change color sprites.. 
 var color_board;
 var y_color;
@@ -169,6 +171,16 @@ var player2_num_img;
 var player3_num_img;
 var player4_num_img;
 
+var temp_player_num1; // for other yuno num setting
+var temp_player_num2; 
+var temp_player_num3;
+var temp_player_num4;
+
+var temp_player1_num_img;
+var temp_player2_num_img;
+var temp_player3_num_img;
+var temp_player4_num_img;
+
 var user_text1; // texts..
 var user_text2;
 var user_text3;
@@ -181,8 +193,8 @@ var direction_img;
 var bomb;
 var bomb_text;
 
-var bomb_sound;
 var card_sound;
+var bomb_sound;
 
 var socket_id;
 
@@ -195,6 +207,10 @@ function create ()
 
   var _this = this;
   game.socket = io();
+
+  // // ----- set sounds
+  // card_sound = this.sound.add('card_sound');
+  // bomb_sound = this.sound.add('bomb_sound');
 
   // ----- get sockect id
   game.socket.on('push_socket_id', function(_socket_id){
@@ -209,10 +225,6 @@ function create ()
 
   // ----- start
   game.socket.on('start', function(){
-
-    // ----- set sounds
-    // card_sound = _this.sound.add('card_sound');
-    // bomb_sound = _this.sound.add('bomb_sound');
 
     // ----- set background
     _this.add.image(550,300,'background');
@@ -316,18 +328,28 @@ function create ()
     
     yuno_button.on('pointerup', function(pointer){
       if(color_board_state == 0){ // not choose color time
-        yuno_button.setTexture('yuno_button_on');
-        player_num1.setTexture(player1_num_img);
+        if(player_yuno_state == 0){ // not use the yuno button this turn
+          yuno_button.setTexture('yuno_button_on');
+          player_num1.setTexture(player1_num_img);
 
-        game.socket.emit('yuno_button_pointerup',room_num, user_num);
+          game.socket.emit('yuno_button_pointerup',room_num, user_num);
+
+        }
       }
     });
     yuno_button.on('pointerdown', function(pointer){
       if(color_board_state == 0){ // not choose color time
-        yuno_button.setTexture('yuno_button_off');
-        player_num1.setTexture('num_yuno');
+        if(player_yuno_state == 0){ // not use the yuno button this turn
+          yuno_button.setTexture('yuno_button_off');
+          if(player1_num_img == 'f_num_1' || player1_num_img == 'f_num_2' || player1_num_img == 'f_num_3' || player1_num_img == 'f_num_4'){
+            player_num1.setTexture('f_num_yuno');
+          }
+          else if(player1_num_img == 'num_1' || player1_num_img == 'num_2' || player1_num_img == 'num_3' || player1_num_img == 'num_4'){
+            player_num1.setTexture('num_yuno');
+          }
 
-        game.socket.emit('yuno_button_pointerdown',room_num, user_num);
+          game.socket.emit('yuno_button_pointerdown',room_num, user_num);
+        }
       }
     });
 
@@ -354,7 +376,6 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
 
-      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -371,7 +392,6 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
 
-      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -388,7 +408,6 @@ function create ()
       g_color.visible = false;
       b_color.visible = false;
       
-      color_board_state = 0;
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -404,8 +423,7 @@ function create ()
       r_color.visible = false;
       g_color.visible = false;
       b_color.visible = false;
-
-      color_board_state = 0;
+    
       field_card.visible = true;
       game_direction.visible = true;
       dummy.visible = true;
@@ -1012,7 +1030,7 @@ function create ()
                 // ----- play a card
                 game.socket.emit('play_a_card',room_num, user_num, this.name);
                 field_card.setTexture(player_arr[this.name]);
-        
+
               });
             }
           }
@@ -1455,9 +1473,143 @@ function create ()
 
   });
 
+  // ----- set the other yuno num
+  game.socket.on('set_the_other_yuno_num', function(num, _user_num, _turn, _dir){
+    // num = 1 pointerdown
+    // num = 0 pointerup
+
+    if(num == 1){ // other user yuno button pointerdown
+
+      //find and set the player num img
+      if((_user_num == 1 && (player2_num_img == 'num_1' || player2_num_img == 'f_num_1')) || (_user_num == 2 && (player2_num_img == 'num_2' || player2_num_img == 'f_num_2')) || (_user_num == 3 && (player2_num_img == 'num_3' || player2_num_img == 'f_num_3')) || (_user_num == 4 && (player2_num_img == 'num_4' || player2_num_img == 'f_num_4'))){
+        temp_player_num2 = _user_num;
+        temp_player2_num_img = player2_num_img;
+        
+        if(_turn == _user_num){ // if other player is turn
+          player2_num_img = 'f_num_yuno';
+        }
+        else{ // or not
+          player2_num_img = 'num_yuno';
+        }
+
+      }
+      else if((_user_num == 1 && (player3_num_img == 'num_1' || player3_num_img == 'f_num_1')) || (_user_num == 2 && (player3_num_img == 'num_2' || player3_num_img == 'f_num_2')) || (_user_num == 3 && (player3_num_img == 'num_3' || player3_num_img == 'f_num_3')) || (_user_num == 4 && (player3_num_img == 'num_4' || player3_num_img == 'f_num_4'))){
+        temp_player_num3 = _user_num;
+        temp_player3_num_img = player3_num_img;
+        
+        if(_turn == _user_num){ // if other player is turn
+          player3_num_img = 'f_num_yuno';
+        }
+        else{ // or not
+          player3_num_img = 'num_yuno';
+        }
+
+      }
+      else if((_user_num == 1 && (player4_num_img == 'num_1' || player4_num_img == 'f_num_1')) || (_user_num == 2 && (player4_num_img == 'num_2' || player4_num_img == 'f_num_2')) || (_user_num == 3 && (player4_num_img == 'num_3' || player4_num_img == 'f_num_3')) || (_user_num == 4 && (player4_num_img == 'num_4' || player4_num_img == 'f_num_4'))){
+        temp_player_num4 = _user_num;
+        temp_player4_num_img = player4_num_img;
+        
+        if(_turn == _user_num){ // if other player is turn
+          player4_num_img = 'f_num_yuno';
+        }
+        else{ // or not
+          player4_num_img = 'num_yuno';
+        }
+       
+      }
+      
+    }
+    
+    else if(num == 0){ // other user yuno button pointerup
+      if(_user_num == temp_player_num2){
+        player2_num_img = temp_player2_num_img;
+
+      }
+      else if(_user_num == temp_player_num3){
+        player3_num_img = temp_player3_num_img;
+
+      }
+      else if(_user_num == temp_player_num4){
+        player4_num_img = temp_player4_num_img;
+
+      }
+      
+    }
+
+    // refresh the player nums
+    if(_dir == 0){ // 반시계 방향 ( + )
+              
+      // num 2
+      if(user_count > 2){
+        player_num2.setTexture(player2_num_img);
+      }
+              
+      // num 3
+      player_num3.setTexture(player3_num_img);
+              
+      // num 4
+      if(user_count == 4){
+        player_num4.setTexture(player4_num_img);
+      }
+
+    }
+    else if(_dir == 1){ // 시계 방향 ( - )
+      if(user_count == 2){
+        // num 3
+        player_num3.setTexture(player3_num_img);
+
+      }
+      else if(user_count == 3){
+        // num 2
+        player_num2.setTexture(player3_num_img);
+  
+        // num 3
+        player_num3.setTexture(player2_num_img);
+
+      }
+      else if(user_count == 4){
+        // num 2
+        player_num2.setTexture(player4_num_img);
+  
+        // num 3
+        player_num3.setTexture(player3_num_img);
+  
+        // num 4
+        player_num4.setTexture(player2_num_img);
+        
+      }
+  
+    }
+
+  });
+
   // ----- set the color board state
   game.socket.on('set_color_board_state', function(state){
     color_board_state = state;
+  });
+
+  // ----- set the player yuno state
+  game.socket.on('set_player_yuno_state', function(state){
+    player_yuno_state = state;
+  });
+
+  game.socket.on('refresh_only_player_cards', function(){
+    // player1
+    get_card(_this);
+    
+    // player2
+    if (user_count > 2){
+      other_card(_this,2);
+    }
+
+    // player3
+    other_card(_this,3);
+    
+    // plyer 4
+    if (user_count == 4){
+      other_card(_this,4);
+    }
+    
   });
 }
 
@@ -1503,6 +1655,9 @@ function get_card(_this){
 
 function refresh_cards(_this){
   console.log("refresh_cards");
+
+  //----- player yuno state
+  player_yuno_state = 0;
 
   //----- player_nums
   game.socket.emit('get_player_nums',room_num, user_num, 2);
