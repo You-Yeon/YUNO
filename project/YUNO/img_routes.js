@@ -337,4 +337,24 @@ router.get('/assets/bomb', function(req, res){
     res.sendFile(__dirname + '/assets/bomb.png');
 });
 
+router.get('/assets/choose_shield_attack_board', function(req, res){
+    res.sendFile(__dirname + '/assets/choose_shield_attack_board.png');
+});
+
+router.get('/assets/shield_button_on', function(req, res){
+    res.sendFile(__dirname + '/assets/shield_button_on.png');
+});
+
+router.get('/assets/shield_button_off', function(req, res){
+    res.sendFile(__dirname + '/assets/shield_button_off.png');
+});
+
+router.get('/assets/attack_button_on', function(req, res){
+    res.sendFile(__dirname + '/assets/attack_button_on.png');
+});
+
+router.get('/assets/attack_button_off', function(req, res){
+    res.sendFile(__dirname + '/assets/attack_button_off.png');
+});
+
 module.exports = router;

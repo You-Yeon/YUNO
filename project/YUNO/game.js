@@ -134,6 +134,12 @@ function preload ()
 
   this.load.image('bomb', '/assets/bomb');
 
+  this.load.image('choose_shield_attack_board', '/assets/choose_shield_attack_board');
+  this.load.image('shield_button_on', '/assets/shield_button_on');
+  this.load.image('shield_button_off', '/assets/shield_button_off');
+  this.load.image('attack_button_on', '/assets/attack_button_on');
+  this.load.image('attack_button_off', '/assets/attack_button_off');
+
   // load audio
   this.load.audio('card_sound', ['assets/taking_card_sound.mp3','assets/taking_card_sound.ogg']);
   this.load.audio('bomb_sound', ['assets/bomb_sound.mp3', 'assets/bomb_sound.ogg']);
@@ -146,6 +152,7 @@ var sprite3;
 var sprite4;
 
 var color_board_state = 0; // 0 : not choose time, 1 : choose time
+var shield_attack_board_state = 0; // 0 : not choose time, 1 : choose time
 var player_yuno_state = 0; // 0 : player can push the yuno button, 1 : player can't push the yuno button 
 
 var color_board_sprite; // change color sprites.. 
@@ -154,6 +161,11 @@ var y_color;
 var r_color;
 var g_color;
 var b_color;
+
+var shield_attack_board_sprite; // choose the shield or attack button
+var shield_attack_board;
+var shield_button;
+var attack_button;
 
 var total_card; // cards..
 var field_card;
@@ -252,8 +264,10 @@ function create ()
     dummy.inputEnabled = true;
 
     dummy.on('pointerup', function(pointer){
-      // ----- get dummy length
-      game.socket.emit('get_dummy_length',room_num, user_num, 1);
+      if(shield_attack_board_state == 0){ // not choose shield attack time
+        // ----- get dummy length
+        game.socket.emit('get_dummy_length',room_num, user_num, 1);
+      }
     });
 
     // ----- set direction text
@@ -328,34 +342,38 @@ function create ()
     
     yuno_button.on('pointerup', function(pointer){
       if(color_board_state == 0){ // not choose color time
-        if(player_yuno_state == 0){ // not use the yuno button this turn
-          yuno_button.setTexture('yuno_button_on');
-          player_num1.setTexture(player1_num_img);
+        if(shield_attack_board_state == 0){ // not choose shield attack time
+          if(player_yuno_state == 0){ // not use the yuno button this turn
+            yuno_button.setTexture('yuno_button_on');
+            player_num1.setTexture(player1_num_img);
 
-          game.socket.emit('yuno_button_pointerup',room_num, user_num);
+            game.socket.emit('yuno_button_pointerup',room_num, user_num);
 
+          }
         }
       }
     });
     yuno_button.on('pointerdown', function(pointer){
       if(color_board_state == 0){ // not choose color time
-        if(player_yuno_state == 0){ // not use the yuno button this turn
-          yuno_button.setTexture('yuno_button_off');
-          if(player1_num_img == 'f_num_1' || player1_num_img == 'f_num_2' || player1_num_img == 'f_num_3' || player1_num_img == 'f_num_4'){
-            player_num1.setTexture('f_num_yuno');
-          }
-          else if(player1_num_img == 'num_1' || player1_num_img == 'num_2' || player1_num_img == 'num_3' || player1_num_img == 'num_4'){
-            player_num1.setTexture('num_yuno');
-          }
+        if(shield_attack_board_state == 0){ // not choose shield attack time
+          if(player_yuno_state == 0){ // not use the yuno button this turn
+            yuno_button.setTexture('yuno_button_off');
+            if(player1_num_img == 'f_num_1' || player1_num_img == 'f_num_2' || player1_num_img == 'f_num_3' || player1_num_img == 'f_num_4'){
+              player_num1.setTexture('f_num_yuno');
+            }
+            else if(player1_num_img == 'num_1' || player1_num_img == 'num_2' || player1_num_img == 'num_3' || player1_num_img == 'num_4'){
+              player_num1.setTexture('num_yuno');
+            }
 
-          game.socket.emit('yuno_button_pointerdown',room_num, user_num);
+            game.socket.emit('yuno_button_pointerdown',room_num, user_num);
+          }
         }
       }
     });
 
     // ----- set color board
     color_board_sprite = _this.add.group();
-    color_board = color_board_sprite.create(450, 260, 'choose_color_board')
+    color_board = color_board_sprite.create(450, 260, 'choose_color_board');
     y_color = color_board_sprite.create(300, 280, 'y_color').setInteractive();
     r_color = color_board_sprite.create(400, 280, 'r_color').setInteractive();
     g_color = color_board_sprite.create(500, 280, 'g_color').setInteractive();
@@ -430,6 +448,56 @@ function create ()
 
       // ----- play a card
       game.socket.emit('play_a_card',room_num, user_num, "b_color");
+
+    });
+
+    // ----- set shield attack board
+    shield_attack_board_sprite = _this.add.group();
+    shield_attack_board = shield_attack_board_sprite.create(450, 260, 'choose_shield_attack_board');
+    shield_button = shield_attack_board_sprite.create(370, 280, 'shield_button_on').setInteractive();
+    attack_button = shield_attack_board_sprite.create(530, 280, 'attack_button_on').setInteractive();
+
+    shield_attack_board_sprite.inputEnabled = false;
+    shield_attack_board.visible = false;
+    shield_button.visible = false;
+    attack_button.visible = false;
+
+    shield_button.on('pointerup', function(pointer){
+      shield_button.setTexture('shield_button_on');
+      shield_attack_board_sprite.inputEnabled = false;
+      shield_attack_board.visible = false;
+      shield_button.visible = false;
+      attack_button.visible = false;
+
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+
+      // ----- shield
+      game.socket.emit('shield_pointer_up',room_num, user_num);
+
+    });
+    shield_button.on('pointerdown', function(pointer){
+      shield_button.setTexture('shield_button_off');
+    });
+
+    attack_button.on('pointerup', function(pointer){
+      attack_button.setTexture('attack_button_on');
+      shield_attack_board_sprite.inputEnabled = false;
+      shield_attack_board.visible = false;
+      shield_button.visible = false;
+      attack_button.visible = false;
+
+      field_card.visible = true;
+      game_direction.visible = true;
+      dummy.visible = true;
+
+      // ----- attack
+      game.socket.emit('attack_pointer_up',room_num, user_num);
+
+    });
+    attack_button.on('pointerdown', function(pointer){
+      attack_button.setTexture('attack_button_off');
 
     });
 
@@ -1016,51 +1084,52 @@ function create ()
         temp_split = player_arr[i].split("_");
         
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0     
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              });
+                });
+              }
             }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
-  
       }
   
     }
@@ -1074,47 +1143,49 @@ function create ()
         temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
-            }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                });
+              }
+            }
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
+
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
@@ -1132,47 +1203,49 @@ function create ()
         temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
-            }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                });
+              }
+            }
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
+
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
@@ -1190,47 +1263,49 @@ function create ()
         temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
-            }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                });
+              }
+            }
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
+
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
@@ -1248,47 +1323,49 @@ function create ()
         temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
-            }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                });
+              }
+            }
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
+
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
@@ -1306,47 +1383,49 @@ function create ()
         temp_split = player_arr[i].split("_");
 
         if(user_num == _turn){ //  when player turn
-          if(_bombs > 0){ // bomb count > 0
-            if(temp_split[1] == 'p'){ // player can play a bomb card
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
-            }
-          }
-          else{ // bomb count == 0
-            if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
-              // 1. same color
-              // 2. same number || same arrow || same ban || same plus
-              // 3. player card is plus 4 card
-              // 4. player card is change color
-              // 5. field card is plus 4 card
-              // 6. field card is change color
+          if(shield_attack_board_state == 0){ // not choose shield attack time
+            if(_bombs > 0){ // bomb count > 0     
+              if(temp_split[1] == 'p'){ // player can play a bomb card
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
 
-              sprite.on('pointerover', function(event){
-                this.y -=70;
-              });
-              sprite.on('pointerout', function(event){
-                this.y +=70;
-              });
-              sprite.on('pointerup', function(pointer){
-                sprite1.clear(_this);
-                
-                // ----- play a card
-                game.socket.emit('play_a_card',room_num, user_num, this.name);
-                field_card.setTexture(player_arr[this.name]);
-        
-              });
+                });
+              }
+            }
+            else{ // bomb count == 0
+              if(field_split[0] == temp_split[0] || field_split[1] == temp_split[1] || temp_split[0] == '4' || temp_split[0] == 'c' || field_split[0] == '4' || field_split[0] == 'c'){
+                // 1. same color
+                // 2. same number || same arrow || same ban || same plus
+                // 3. player card is plus 4 card
+                // 4. player card is change color
+                // 5. field card is plus 4 card
+                // 6. field card is change color
+
+                sprite.on('pointerover', function(event){
+                  this.y -=70;
+                });
+                sprite.on('pointerout', function(event){
+                  this.y +=70;
+                });
+                sprite.on('pointerup', function(pointer){
+                  sprite1.clear(_this);
+                  
+                  // ----- play a card
+                  game.socket.emit('play_a_card',room_num, user_num, this.name);
+                  field_card.setTexture(player_arr[this.name]);
+          
+                });
+              }
             }
           }
         }
@@ -1466,6 +1545,19 @@ function create ()
     r_color.visible = true;
     g_color.visible = true;
     b_color.visible = true;
+
+    field_card.visible = false;
+    game_direction.visible = false;
+    dummy.visible = false;
+
+  });
+
+  // ----- show shield attack board
+  game.socket.on('show_shield_attack_board_board', function(){
+    shield_attack_board_sprite.inputEnabled = true;
+    shield_attack_board.visible = true;
+    shield_button.visible = true;
+    attack_button.visible = true;
     
     field_card.visible = false;
     game_direction.visible = false;
@@ -1588,6 +1680,11 @@ function create ()
     color_board_state = state;
   });
 
+  // ----- set the shield attack board state
+  game.socket.on('set_shield_attack_board_state', function(state){
+    shield_attack_board_state = state;
+  });
+
   // ----- set the player yuno state
   game.socket.on('set_player_yuno_state', function(state){
     player_yuno_state = state;
@@ -1609,7 +1706,7 @@ function create ()
     if (user_count == 4){
       other_card(_this,4);
     }
-    
+
   });
 }
 

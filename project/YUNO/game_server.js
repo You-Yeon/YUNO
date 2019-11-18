@@ -155,7 +155,7 @@ var Shuffle_cards = function(room_num, user_count){
 
   // player cards
   for(var i = 0; i < user_count; i++){
-    for(var j = 0; j < 7; j++)
+    for(var j = 0; j < 1; j++)
     {
       k = parseInt(Math.random()*g_dummy_cards[room_num].length);
       temp.push(g_dummy_cards[room_num][k]);
@@ -475,48 +475,11 @@ io.on('connection', function(socket){
     var index = g_user_num[r_num].indexOf(u_num);
     var turn = g_turn_is[r_num];
     var dir = g_direction_is[r_num];
-    var temp;
-    var cnt = 0;
 
-    // set shield
-    temp = g_player_cards[r_num][index].split('/');
-    if(temp.length == 1){
-      g_yuno_state[r_num][index] = 1; // get shield
-      cnt = 1;
-    }
-
-    // check attack
-    for(var i = 0; i < g_user_name[r_num].length; i++){
-      if(i != index){
-        temp = g_player_cards[r_num][i].split('/');
-        if(temp.length == 1 && g_yuno_state[r_num][i] == 0){
-          for(var j = 0; j < 2; j++){
-            k = parseInt(Math.random()*g_dummy_cards[r_num].length);
-            temp.push(g_dummy_cards[r_num][k]);
-            g_dummy_cards[r_num].splice(k,1);
-          }
-          g_player_cards[r_num][i] = temp.join('/');
-          
-          cnt = 1;
-        }
-      }
-    }
-
-    // if not shield and not attack, just mistake
-    if(cnt == 0){
-      temp = g_player_cards[r_num][index].split('/');
-      for(var j = 0; j < 2; j++){
-        k = parseInt(Math.random()*g_dummy_cards[r_num].length);
-        temp.push(g_dummy_cards[r_num][k]);
-        g_dummy_cards[r_num].splice(k,1);
-      }
-      g_player_cards[r_num][index] = temp.join('/');
-    }
-
-    //refresh only player cards
-    for(var i = 0; i < g_user_socketID[r_num].length; i++){
-      io.to(g_user_socketID[r_num][i]).emit('refresh_only_player_cards');
-    }
+    // //refresh only player cards
+    // for(var i = 0; i < g_user_socketID[r_num].length; i++){
+    //   io.to(g_user_socketID[r_num][i]).emit('refresh_only_player_cards');
+    // }
 
     // set player nums
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
@@ -529,16 +492,145 @@ io.on('connection', function(socket){
   socket.on('yuno_button_pointerup', function(r_num, u_num){
     var index = g_user_num[r_num].indexOf(u_num);
     var dir = g_direction_is[r_num];
+    var temp;
+    var shield_cnt = 0;
+    var attack_cnt = 0;
+    var no_effect = 0;
+
+    // check shield
+    temp = g_player_cards[r_num][index].split('/');
+    if(temp.length == 1){
+      shield_cnt = 1;
+    }
+
+    // check attack
+    for(var i = 0; i < g_user_name[r_num].length; i++){
+      if(i != index){
+        temp = g_player_cards[r_num][i].split('/');
+        if(temp.length == 1 && g_yuno_state[r_num][i] == 0){ // the player hasn't a shield          
+          attack_cnt = 1;
+        }
+        else if(temp.length == 1 && g_yuno_state[r_num][i] == 1){ //  the player has a shield
+          no_effect = 1;
+        }
+      }
+    }
+    
+    // when the player card length is 1, but he has shield.
+    // nothing effect
+    if(no_effect == 1){
+      // As I said it does nothing.
+    }
+    // when shield cnt is 1 and attack cnt is 1, show the shield attack board 
+    else if(shield_cnt == 1 && attack_cnt == 1){
+      // No effect yet.
+    }
+    // if not shield and not attack, just mistake
+    else if(shield_cnt == 0 && attack_cnt == 0){
+      temp = g_player_cards[r_num][index].split('/');
+      for(var j = 0; j < 2; j++){
+        k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+        temp.push(g_dummy_cards[r_num][k]);
+        g_dummy_cards[r_num].splice(k,1);
+      }
+      g_player_cards[r_num][index] = temp.join('/');
+    }
+    // shield effect
+    else if(shield_cnt == 1){
+      temp = g_player_cards[r_num][index].split('/');
+      g_yuno_state[r_num][index] = 1; // get shield
+  
+    }
+    // attack effect
+    else if(attack_cnt == 1){
+      for(var i = 0; i < g_user_name[r_num].length; i++){
+        if(i != index){
+          temp = g_player_cards[r_num][i].split('/');
+          if(temp.length == 1 && g_yuno_state[r_num][i] == 0){ // the player hasn't a shield
+            for(var j = 0; j < 2; j++){
+              k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+              temp.push(g_dummy_cards[r_num][k]);
+              g_dummy_cards[r_num].splice(k,1);
+            }
+            g_player_cards[r_num][i] = temp.join('/');
+            
+          }
+        }
+      }
+
+    }
+
+    //refresh only player cards
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('refresh_only_player_cards');
+    }
 
     // set player nums
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       if(i == index){
+        if(shield_cnt == 1 && attack_cnt == 1){ 
+          io.to(g_user_socketID[r_num][index]).emit('show_shield_attack_board_board');
+          io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // set the shield attack board state = 1
+        }
         io.to(g_user_socketID[r_num][i]).emit('set_player_yuno_state', 1); // set the player yuno state = 1
+        
       }
       if(i != index){
         io.to(g_user_socketID[r_num][i]).emit('set_the_other_yuno_num', 0, u_num, 0, dir);
+        if(shield_cnt == 1 && attack_cnt == 1){ 
+          io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // set the shield attack board state = 1
+        }
       }
     }
+  });
+
+  socket.on('shield_pointer_up', function(r_num, u_num){
+    var index = g_user_num[r_num].indexOf(u_num);
+    var dir = g_direction_is[r_num];
+    var temp;
+
+    // shield effect
+    temp = g_player_cards[r_num][index].split('/');
+    g_yuno_state[r_num][index] = 1; // get shield
+
+    // set shield attack state
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 0); // set the shield attack board state = 0
+    }
+
+  });
+
+  socket.on('attack_pointer_up', function(r_num, u_num){
+    var index = g_user_num[r_num].indexOf(u_num);
+    var dir = g_direction_is[r_num];
+    var temp;
+
+    // attack effect
+    for(var i = 0; i < g_user_name[r_num].length; i++){
+      if(i != index){
+        temp = g_player_cards[r_num][i].split('/');
+        if(temp.length == 1 && g_yuno_state[r_num][i] == 0){ // the player hasn't a shield
+          for(var j = 0; j < 2; j++){
+            k = parseInt(Math.random()*g_dummy_cards[r_num].length);
+            temp.push(g_dummy_cards[r_num][k]);
+            g_dummy_cards[r_num].splice(k,1);
+          }
+          g_player_cards[r_num][i] = temp.join('/');
+          
+        }
+      }
+    }
+    
+    //refresh only player cards
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('refresh_only_player_cards');
+    }
+
+    // set shield attack state
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 0); // set the shield attack board state = 0
+    }
+
   });
 
   socket.on('get_player_info', function(r_num, u_num){
