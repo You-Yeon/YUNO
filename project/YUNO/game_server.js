@@ -364,7 +364,21 @@ io.on('connection', function(socket){
     }
     
     // --- set shield
-    g_yuno_state[r_num][index] = 0; // get shield
+    g_yuno_state[r_num][index] = 0; 
+
+    var dir = g_direction_is[r_num];
+    var num_arr = new Array();
+    var shield_arr = new Array();
+
+    for(var i = 0; i < g_user_num[r_num].length; i++){
+      num_arr.push(g_user_num[r_num][i]);
+      shield_arr.push(g_yuno_state[r_num][i]);
+    }
+
+    // set the shield icons
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_the_player_shield_icons', num_arr, shield_arr, dir);
+    }
 
     // --- find index
     index = g_user_num[r_num].indexOf(g_turn_is[r_num]);
@@ -537,9 +551,23 @@ io.on('connection', function(socket){
     }
     // shield effect
     else if(shield_cnt == 1){
-      temp = g_player_cards[r_num][index].split('/');
+      var dir = g_direction_is[r_num];
+      var num_arr = new Array();
+      var shield_arr = new Array();
+  
+      // shield effect
       g_yuno_state[r_num][index] = 1; // get shield
   
+      for(var i = 0; i < g_user_num[r_num].length; i++){
+        num_arr.push(g_user_num[r_num][i]);
+        shield_arr.push(g_yuno_state[r_num][i]);
+      }
+
+      // set the shield icons
+      for(var i = 0; i < g_user_socketID[r_num].length; i++){
+        io.to(g_user_socketID[r_num][i]).emit('set_the_player_shield_icons', num_arr, shield_arr, dir);
+      }
+
     }
     // attack effect
     else if(attack_cnt == 1){
@@ -587,15 +615,21 @@ io.on('connection', function(socket){
   socket.on('shield_pointer_up', function(r_num, u_num){
     var index = g_user_num[r_num].indexOf(u_num);
     var dir = g_direction_is[r_num];
-    var temp;
+    var num_arr = new Array();
+    var shield_arr = new Array();
 
     // shield effect
-    temp = g_player_cards[r_num][index].split('/');
     g_yuno_state[r_num][index] = 1; // get shield
 
-    // set shield attack state
+    for(var i = 0; i < g_user_num[r_num].length; i++){
+      num_arr.push(g_user_num[r_num][i]);
+      shield_arr.push(g_yuno_state[r_num][i]);
+    }
+
+    // set shield attack state and set the shield icons
     for(var i = 0; i < g_user_socketID[r_num].length; i++){
       io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 0); // set the shield attack board state = 0
+      io.to(g_user_socketID[r_num][i]).emit('set_the_player_shield_icons', num_arr, shield_arr, dir);
     }
 
   });

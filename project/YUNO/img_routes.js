@@ -357,4 +357,12 @@ router.get('/assets/attack_button_off', function(req, res){
     res.sendFile(__dirname + '/assets/attack_button_off.png');
 });
 
+router.get('/assets/u_shield_icon', function(req, res){
+    res.sendFile(__dirname + '/assets/u_shield_icon.png');
+});
+
+router.get('/assets/o_shield_icon', function(req, res){
+    res.sendFile(__dirname + '/assets/o_shield_icon.png');
+});
+
 module.exports = router;

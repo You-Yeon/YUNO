@@ -140,6 +140,9 @@ function preload ()
   this.load.image('attack_button_on', '/assets/attack_button_on');
   this.load.image('attack_button_off', '/assets/attack_button_off');
 
+  this.load.image('u_shield_icon', '/assets/u_shield_icon');
+  this.load.image('o_shield_icon', '/assets/o_shield_icon');
+
   // load audio
   this.load.audio('card_sound', ['assets/taking_card_sound.mp3','assets/taking_card_sound.ogg']);
   this.load.audio('bomb_sound', ['assets/bomb_sound.mp3', 'assets/bomb_sound.ogg']);
@@ -183,15 +186,18 @@ var player2_num_img;
 var player3_num_img;
 var player4_num_img;
 
-var temp_player_num1; // for other yuno num setting
 var temp_player_num2; 
 var temp_player_num3;
 var temp_player_num4;
 
-var temp_player1_num_img;
-var temp_player2_num_img;
+var temp_player2_num_img; // for other yuno num setting..
 var temp_player3_num_img;
 var temp_player4_num_img;
+
+var player1_shield_img; // shield icon image..
+var player2_shield_img;
+var player3_shield_img;
+var player4_shield_img;
 
 var user_text1; // texts..
 var user_text2;
@@ -335,6 +341,17 @@ function create ()
 
     // ----- set player nums and direction
     game.socket.emit('get_player_nums',room_num, user_num, 1);
+
+    // ----- set player shield icon image
+    player1_shield_img = _this.add.image(675,430,'u_shield_icon');
+    player2_shield_img = _this.add.image(796,112,'o_shield_icon');
+    player3_shield_img = _this.add.image(320,92,'o_shield_icon');
+    player4_shield_img = _this.add.image(103,346,'o_shield_icon');
+
+    player1_shield_img.visible = false;
+    player2_shield_img.visible = false;
+    player3_shield_img.visible = false;
+    player4_shield_img.visible = false;
 
     // ----- set yuno_button
     yuno_button = _this.add.image(790,528,'yuno_button_on').setInteractive();
@@ -1507,21 +1524,21 @@ function create ()
       {
         if(player_arr.length <= 12){
           if(i < 11){
-            var sprite = sprite4.create(85,334-i*20,'other_card')
+            var sprite = sprite4.create(85,114+i*20,'other_card')
             sprite.angle += 90;
           }
           else if(i == 11){
-            var sprite = sprite4.create(85,334-i*20,'other_card')
+            var sprite = sprite4.create(85,114+i*20,'other_card')
             sprite.angle += 90;
           }
         }
         else if(player_arr.length > 12){
           if(i < 11){
-            var sprite = sprite4.create(85,334-i*20,'other_card')
+            var sprite = sprite4.create(85,114+i*20,'other_card')
             sprite.angle += 90;
           }
           else if(i == 11){
-            var sprite = sprite4.create(85,334-i*20,'p_other_card')
+            var sprite = sprite4.create(85,114+i*20,'p_other_card')
             sprite.angle += 90;
           }
           else if(i > 11){
@@ -1668,6 +1685,220 @@ function create ()
   
         // num 4
         player_num4.setTexture(player2_num_img);
+        
+      }
+  
+    }
+
+  });
+
+  // ----- set the player shield icons
+  game.socket.on('set_the_player_shield_icons', function(_player_arr, _shield_arr, _dir){
+    // _state = false : shield off
+    // _state = ture : shield on
+
+    //find index
+    var index = _player_arr.indexOf(user_num);
+
+    // set the shield icons
+    if(_dir == 0){ // 반시계 방향 ( + )
+      if(user_count == 2){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+        
+        index += 1;
+        if(index == 2){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+
+      }
+      else if(user_count == 3){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+        
+        index += 1;
+        if(index == 3){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player2_shield_img.visible = true;
+        }
+        else{
+          player2_shield_img.visible = false;
+        }
+
+        index += 1;
+        if(index == 3){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+      }
+      else if(user_count == 4){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+        
+        index += 1;
+        if(index == 4){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player2_shield_img.visible = true;
+        }
+        else{
+          player2_shield_img.visible = false;
+        }
+
+        index += 1;
+        if(index == 4){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+
+        index += 1;
+        if(index == 4){
+          index = 0;
+        }
+
+        if(_shield_arr[index] == 1){
+          player4_shield_img.visible = true;
+        }
+        else{
+          player4_shield_img.visible = false;
+        }
+      }
+
+    }
+    else if(_dir == 1){ // 시계 방향 ( - )
+      if(user_count == 2){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+        
+        index -= 1;
+        if(index == -1){
+          index = 1;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+
+      }
+      else if(user_count == 3){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+
+        index -= 1;
+        if(index == -1){
+          index = 2;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+
+        index -= 1;
+        if(index == -1){
+          index = 2;
+        }
+
+        if(_shield_arr[index] == 1){
+          player2_shield_img.visible = true;
+        }
+        else{
+          player2_shield_img.visible = false;
+        }
+
+      }
+      else if(user_count == 4){
+        if(_shield_arr[index] == 1){
+          player1_shield_img.visible = true;
+        }
+        else{
+          player1_shield_img.visible = false;
+        }
+
+        index -= 1;
+        if(index == -1){
+          index = 3;
+        }
+
+        if(_shield_arr[index] == 1){
+          player4_shield_img.visible = true;
+        }
+        else{
+          player4_shield_img.visible = false;
+        }
+
+        index -= 1;
+        if(index == -1){
+          index = 3;
+        }
+
+        if(_shield_arr[index] == 1){
+          player3_shield_img.visible = true;
+        }
+        else{
+          player3_shield_img.visible = false;
+        }
+
+        index -= 1;
+        if(index == -1){
+          index = 3;
+        }
+
+        if(_shield_arr[index] == 1){
+          player2_shield_img.visible = true;
+        }
+        else{
+          player2_shield_img.visible = false;
+        }
         
       }
   
