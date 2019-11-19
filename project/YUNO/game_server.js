@@ -14,6 +14,16 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'yuyeon',
+  password : '0607',
+  port     : '3306',
+  database : 'yuno'
+});
+connection.connect();
+
 app.use(bodyParser.urlencoded({
   extended: false
 }));
@@ -37,6 +47,8 @@ var g_turn_is = new Array(); // who turn?
 var g_direction_is = new Array(); // what direction?
 var g_yuno_state = new Array(new Array()); // 0 : not shield, 1: shield
 var g_bomb_cnt = new Array();
+var g_score = new Array(new Array());
+var g_end = new Array();
 
 var g_name;
 var g_num;
@@ -92,6 +104,7 @@ app.post('/',function(req, res){
     g_text_info_num[room_count] = new Array();
     g_text_info_name[room_count] = new Array();
     g_yuno_state[room_count] = new Array();
+    g_score[room_count] = new Array();
   }
 
   // set cookie
@@ -252,6 +265,9 @@ var ArraySort = function(room_num){
   
   // setting bomb
   g_bomb_cnt.push(0); // 폭탄 갯수
+
+  // game
+  g_end.push(0); // 0 : not end, 1 : normal end
 
   console.log("F g_user_num : " + g_user_num);
   console.log("F g_user_name : " + g_user_name);
@@ -720,6 +736,56 @@ io.on('connection', function(socket){
 
   });
 
+  socket.on('get_player_score', function(r_num){
+    var temp;
+    var temp_split;
+    var total;
+
+    var score_arr = new Array();
+    var name_arr = new Array();
+
+    // Calculation the score
+    if(g_score[r_num].length != g_user_name[r_num].length){
+      for(var i = 0; i < g_user_name[r_num].length; i++){
+        temp = g_player_cards[r_num][i].split('/');
+        if(temp[0] == 0){ // winner
+          g_score[r_num].push(0);
+        }
+        else{
+          total = 0;
+          for(var j = 0; j < temp.length; j++){
+            temp_split = temp[j].split("_");
+            if(temp_split[1] == 'r' || temp_split[1] == 'b' || temp_split[1] == 'p' || temp_split[1] == 'c'){
+              // arrow || ban || plus_2 || plus_4 || change_color_card = + 20 score
+              total += 20;
+            }
+            else{ // number card ..
+              total += Number(temp_split[1]);
+            }
+          }
+          g_score[r_num].push(total);
+        }
+  
+      }
+
+    }
+
+    console.log("g_user_name[r_num] :"+ g_user_name[r_num]);
+    console.log("g_score[r_num] :" + g_score[r_num]);
+
+    // set array
+    for(var i = 0; i < g_user_num[r_num].length; i++){
+      score_arr.push(g_score[r_num][i]);
+      name_arr.push(g_user_name[r_num][i]);
+    }
+
+    // set player score
+    for(var i = 0; i < g_user_socketID[r_num].length; i++){
+      io.to(g_user_socketID[r_num][i]).emit('set_player_score', name_arr, score_arr, 0);
+    }
+
+  });
+
   socket.on('play_a_card', function(r_num, u_num, _index){
 
     console.log("_index :" + _index);
@@ -746,10 +812,10 @@ io.on('connection', function(socket){
         // set cards
         temp.splice(_index,1);
         if(temp.length == 0){
-          temp.push(0);
+          temp = new Array();
         }
         g_player_cards[r_num][index] = temp.join('/');
-        
+
         io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, '0_0', 0, 0, 0); // block player cards
         io.to(g_user_socketID[r_num][index]).emit('show_change_color_board'); // show the change color board
         for(var i = 0; i < g_user_socketID[r_num].length; i++){ // set the color board state
@@ -774,7 +840,7 @@ io.on('connection', function(socket){
           for(var i = 0; i < g_user_socketID[r_num].length; i++){ // set the color board state
             io.to(g_user_socketID[r_num][i]).emit('set_color_board_state', 0);
           }
-
+          temp = g_player_cards[r_num][index].split('/');
         }
         else{
           // set cards and push the field card
@@ -904,14 +970,27 @@ io.on('connection', function(socket){
         }
 
         if(temp[0] == 0){ // *****  WIN ! ***** 
+          g_end[r_num] = 1; // end
           index = g_user_num[r_num].indexOf(u_num);
 
           for(var i = 0; i < g_user_socketID[r_num].length; i++){
-            if(i == index){
-              io.to(g_user_socketID[r_num][i]).emit('win'); // win
+            if(i == index){ // win
+              io.to(g_user_socketID[r_num][i]).emit('win', 0); // win
+              connection.query('UPDATE user SET wins = wins + 1 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+                if (!err)
+                  console.log('The solution is: ', rows);
+                else
+                  console.log('Error while performing Query.', err);
+              });
             }
-            else{
+            else{ // lose
               io.to(g_user_socketID[r_num][i]).emit('lose'); // lose
+              connection.query('UPDATE user SET losses = losses + 1 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+                if (!err)
+                  console.log('The solution is: ', rows);
+                else
+                  console.log('Error while performing Query.', err);
+              });
             }
             io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // all player blocking
 
@@ -923,44 +1002,179 @@ io.on('connection', function(socket){
 
   });
 
+  socket.on('disconnect', function(){
+  
+    console.log('user disconnected: ', socket.id);
+  
+    var r_num;
+    var index;
 
-  // ---------------- del
-  //
-  // socket.on('disconnect', function(){
+    // find room num and index
+    for(var i = 0; i < room_count; i++){
+      for(var j = 0; j < g_user_socketID[i].length; j++){
+        if(g_user_socketID[i][j] == socket.id){
+          r_num = i;
+          index = j;
+        }
+      }
+    }
+
+    if(g_end[r_num] == 0){ // adnormal game
+      var text_index = g_text_info_name[r_num].indexOf(g_user_name[r_num][index]);
+      var num_arr = new Array();
+      var name_arr = new Array();
+
+      for(var i = 0; i < g_user_num[r_num].length; i++){
+        num_arr.push(g_text_info_num[r_num][i]);
+        name_arr.push(g_text_info_name[r_num][i]);
+      }
+
+      // set disconnected text
+      for(var i = 0; i < g_user_socketID[r_num].length; i++){
+        io.to(g_user_socketID[r_num][i]).emit('set_disconnected_player', text_index, num_arr, name_arr);
+        io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // all player blocking
+      }
+
+      // set score
+      var temp;
+      var temp_split;
+      var total;
   
-  //   console.log('user disconnected: ', socket.id);
+      var score_arr = new Array();
+      var name_arr2 = new Array();
   
-  //   for( var i = 0; i < user_socketID[room_num].length; i++){
-  //     io.to(user_socketID[room_num][i]).emit('receive message',name + '님이 퇴장하였습니다.');
-  //   }
+      // Calculation the score
+      for(var i = 0; i < g_user_name[r_num].length; i++){
+        if(i != index){
+          temp = g_player_cards[r_num][i].split('/');
+          total = 0;
+          for(var j = 0; j < temp.length; j++){
+            temp_split = temp[j].split("_");
+            if(temp_split[1] == 'r' || temp_split[1] == 'b' || temp_split[1] == 'p' || temp_split[1] == 'c'){
+              // arrow || ban || plus_2 || plus_4 || change_color_card = + 20 score
+              total += 20;
+            }
+            else{ // number card ..
+              total += Number(temp_split[1]);
+            }
+          }
+          g_score[r_num].push(total);
+        }
+      }
+
+      // update losses
+      connection.query('UPDATE user SET losses = losses + 1 WHERE name = \''+ g_user_name[r_num][index] + '\'', function(err, rows, fields) {
+        if (!err)
+          console.log('The solution is: ', rows);
+        else
+          console.log('Error while performing Query.', err);
+      });
+
+      // remove..
+      g_user_name[r_num].splice(index, 1);
+      g_user_socketID[r_num].splice(index, 1);
+
+      console.log("g_user_name[r_num] :"+ g_user_name[r_num]);
+      console.log("g_score[r_num] :" + g_score[r_num]);
   
-  //   //del data
-  //   var temp = user_socketID[room_num].indexOf(socket.id);
+      // set array
+      for(var i = 0; i < g_user_name[r_num].length; i++){
+        score_arr.push(g_score[r_num][i]);
+        name_arr2.push(g_user_name[r_num][i]);
+      }
   
-  //   user_name[room_num].splice(temp,1);
-  //   user_num[room_num].splice(temp,1);
-  //   user_wins[room_num].splice(temp,1);
-  //   user_losses[room_num].splice(temp,1);
-  //   user_state[room_num].splice(temp,1);
-  //   user_socketID[room_num].splice(temp,1);
+      // min score is winner
+      var min = Math.min.apply(null, score_arr);
+      
+      // set player score
+      for(var i = 0; i < g_user_name[r_num].length; i++){
+        if(score_arr[i] == min){ // winner
+          io.to(g_user_socketID[r_num][i]).emit('win', 1); // win
+          connection.query('UPDATE user SET wins = wins + 1 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+            if (!err)
+              console.log('The solution is: ', rows);
+            else
+              console.log('Error while performing Query.', err);
+          });
+        }
+        else{
+          io.to(g_user_socketID[r_num][i]).emit('lose'); // lose
+          connection.query('UPDATE user SET losses = losses + 1 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+            if (!err)
+              console.log('The solution is: ', rows);
+            else
+              console.log('Error while performing Query.', err);
+          });
+        }
+        io.to(g_user_socketID[r_num][i]).emit('set_player_score', name_arr2, score_arr, 1);
+      }
+      
+      g_user_num[r_num].splice(index, 1);
+      g_user_state[r_num].splice(index, 1);
+      g_user_socketID_check[r_num].splice(index, 1);
+      g_player_cards[r_num].splice(index, 1);
+      g_text_info_num[r_num].splice(index, 1);
+      g_text_info_name[r_num].splice(index, 1);
+      g_yuno_state[r_num].splice(index, 1);
+      g_score[r_num].splice(index, 1);
+      
+      g_end[r_num] = 1;
+    }
+    else{ // normal game
+
+      // remove..
+      g_user_name[r_num].splice(index, 1);
+      g_user_num[r_num].splice(index, 1);
+      g_user_state[r_num].splice(index, 1);
+      g_user_socketID_check[r_num].splice(index, 1);
+      g_user_socketID[r_num].splice(index, 1);
+      g_player_cards[r_num].splice(index, 1);
+      g_text_info_num[r_num].splice(index, 1);
+      g_text_info_name[r_num].splice(index, 1);
+      g_yuno_state[r_num].splice(index, 1);
+      g_score[r_num].splice(index, 1);
+
+      if(g_user_name[r_num].length == 0){ // last player
+        g_dummy_cards[r_num] = new Array();
+        g_field_card[r_num] = new Array();
+        g_turn_is[r_num] = 0;
+        g_direction_is[r_num] = 0;
+        g_bomb_cnt[r_num] = 0;
+        g_end[r_num] = 0;
+
+        // check remove
+        console.log("remove g_user_name[r_num] :" + g_user_name[r_num]);
+        console.log("remove g_user_num[r_num] :" + g_user_num[r_num]);
+        console.log("remove g_user_state[r_num] :" + g_user_state[r_num]);
+        console.log("remove g_user_socketID_check[r_num] :" + g_user_socketID_check[r_num]);
+        console.log("remove g_user_socketID[r_num] :" + g_user_socketID[r_num]);
+        console.log("remove g_player_cards[r_num] :" + g_player_cards[r_num]);
+        console.log("remove g_text_info_num[r_num] :" + g_text_info_num[r_num]);
+        console.log("remove g_text_info_name[r_num] :" + g_text_info_name[r_num]);
+        console.log("remove g_yuno_state[r_num] :" + g_yuno_state[r_num]);
+        console.log("remove g_score[r_num] :" + g_score[r_num]);
+
+        console.log("remove g_dummy_cards[r_num] :" + g_dummy_cards[r_num]);
+        console.log("remove g_field_card[r_num] :" + g_field_card[r_num]);
+        console.log("remove g_turn_is :" + g_turn_is);
+        console.log("remove g_direction_is :" + g_direction_is);
+        console.log("remove g_bomb_cnt :" + g_bomb_cnt);
+        console.log("remove g_end :" + g_end);
+      }
+    }
   
-  //   //set host
-  //   if(user_state[room_num].length != 0){
-  //     user_state[room_num][0] = 'host';
-  //     state = 'host';
+
+    // //del data
+    // var temp = user_socketID[room_num].indexOf(socket.id);
   
-  //     io.to(user_socketID[room_num][0]).emit('set state',state);
-  //   }
+    // user_name[room_num].splice(temp,1);
+    // user_num[room_num].splice(temp,1);
+    // user_wins[room_num].splice(temp,1);
+    // user_losses[room_num].splice(temp,1);
+    // user_state[room_num].splice(temp,1);
+    // user_socketID[room_num].splice(temp,1);
   
-  //   //set values
-  //   for( var i = 0; i < user_socketID[room_num].length; i++){
-  //     io.to(user_socketID[room_num][i]).emit('clear');
-  //     for( var j = 0; j < user_name[room_num].length; j++){
-  //         io.to(user_socketID[room_num][i]).emit('change value',user_name[room_num][j], user_wins[room_num][j], user_losses[room_num][j], user_state[room_num][j], user_num[room_num][j]);
-  //     }
-  //   }
-  
-  // });
+  });
 
 });
 

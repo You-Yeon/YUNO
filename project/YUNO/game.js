@@ -18,7 +18,7 @@
 
 var config = {
     type: Phaser.AUTO,
-    width: 1300,
+    width: 1400,
     height: 600,
     audio: {
       noAudio: true
@@ -207,6 +207,12 @@ var user_text2;
 var user_text3;
 var user_text4;
 var direction_text;
+
+var rank_text; // rank..
+var rank1_text;
+var rank2_text;
+var rank3_text;
+var rank4_text;
 
 var game_direction;
 var direction_img;
@@ -1954,13 +1960,338 @@ function create ()
   });
 
   // ----- win !
-  game.socket.on('win', function(){
+  game.socket.on('win', function(num){
+    // num : 0 = normal
+    // num : 1 = abnormal
     _this.add.image(450,300,'win');
+
+    if(num == 0){
+      // get player score
+      game.socket.emit('get_player_score', room_num);
+    }
   });
 
   // ----- lose
   game.socket.on('lose', function(){
     _this.add.image(450,300,'lose');
+
+  });
+
+  // ----- set player score
+  game.socket.on('set_player_score', function(_name_arr, _score_arr, num){
+    
+    // num : 0 = normal
+    // num : 1 = abnormal
+
+    var temp;
+    var rank_num = 1;
+    var rank_arr = new Array();
+    var rank_color;
+
+    // arr sorting
+    for (var i = 0; i < _name_arr.length - 1; i++){
+      for ( var j = 0; j < _name_arr.length - 1- i; j++){
+        if (_score_arr[j] > _score_arr[j + 1]){
+            //name change
+            temp = _name_arr[j];
+            _name_arr[j] = _name_arr[j + 1];
+            _name_arr[j + 1] = temp;
+
+            //score change 
+            temp = _score_arr[j];
+            _score_arr[j] = _score_arr[j + 1];
+            _score_arr[j + 1] = temp;
+        }
+      }
+    }
+
+    // add rank
+    for (var i = 0; i < _name_arr.length; i++){
+      if(i == 0){
+        rank_arr.push(rank_num);
+      }
+      else{
+        if(_score_arr[i-1] == _score_arr[i]){
+          rank_arr.push(rank_num);
+        }
+        else{
+          rank_num += 1;
+          rank_arr.push(rank_num);
+        }
+      }
+    }
+
+    // set texts
+    if(num == 0){ // normal
+      if(user_count == 2){
+        rank_text = _this.add.text(910, 130, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 200, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+        if(rank_arr[1] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank2_text = _this.add.text(910, 250, rank_arr[1] + '. ' + _name_arr[1] + ' (' + _score_arr[1] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank2_text.setStroke('#000', 7);
+
+      }
+      else if(user_count == 3){
+        rank_text = _this.add.text(910, 180, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 250, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+        if(rank_arr[1] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank2_text = _this.add.text(910, 300, rank_arr[1] + '. ' + _name_arr[1] + ' (' + _score_arr[1] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank2_text.setStroke('#000', 7);
+
+        if(rank_arr[2] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank3_text = _this.add.text(910, 350, rank_arr[2] + '. ' + _name_arr[2] + ' (' + _score_arr[2] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank3_text.setStroke('#000', 7);
+        
+      }
+      else if(user_count == 4){
+        rank_text = _this.add.text(910, 230, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 300, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+        if(rank_arr[1] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank2_text = _this.add.text(910, 350, rank_arr[1] + '. ' + _name_arr[1] + ' (' + _score_arr[1] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank2_text.setStroke('#000', 7);
+
+        if(rank_arr[2] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank3_text = _this.add.text(910, 400, rank_arr[2] + '. ' + _name_arr[2] + ' (' + _score_arr[2] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank3_text.setStroke('#000', 7);
+
+        if(rank_arr[3] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank4_text = _this.add.text(910, 450, rank_arr[3] + '. ' + _name_arr[3] + ' (' + _score_arr[3] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank4_text.setStroke('#000', 7);
+
+      }
+    }
+    else if(num == 1){ // abnormal
+      if(user_count == 2){
+        rank_text = _this.add.text(910, 130, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 200, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+      }
+      else if(user_count == 3){
+        rank_text = _this.add.text(910, 180, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 250, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+        if(rank_arr[1] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank2_text = _this.add.text(910, 300, rank_arr[1] + '. ' + _name_arr[1] + ' (' + _score_arr[1] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank2_text.setStroke('#000', 7);
+        
+      }
+      else if(user_count == 4){
+        rank_text = _this.add.text(910, 230, "RANK", {
+          font: "50px DungGeunMo",
+          fill: "#FF8300",
+          align: "center"
+        });
+        
+        rank_text.setStroke('#000', 7);
+
+        rank1_text = _this.add.text(910, 300, rank_arr[0] + '. ' + _name_arr[0] + ' (' + _score_arr[0] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: "#FFEB01",
+          align: "center"
+        });
+
+        rank1_text.setStroke('#000', 7);
+
+        if(rank_arr[1] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank2_text = _this.add.text(910, 350, rank_arr[1] + '. ' + _name_arr[1] + ' (' + _score_arr[1] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank2_text.setStroke('#000', 7);
+
+        if(rank_arr[2] == 1){
+          rank_color = "#FFEB01";
+        }
+        else{
+          rank_color = "#C9C9C9"
+        }
+
+        rank3_text = _this.add.text(910, 400, rank_arr[2] + '. ' + _name_arr[2] + ' (' + _score_arr[2] + ' score)', {
+          font: "30px DungGeunMo",
+          fill: rank_color,
+          align: "center"
+        });
+
+        rank3_text.setStroke('#000', 7);
+
+      }
+    }
+
+
+  });
+
+  // ----- set disconnected player
+  game.socket.on('set_disconnected_player', function(text_index, num_arr, name_arr){
+
+    if(text_index == 0){
+      user_text1.setText("Player"+ num_arr[0] +' : ' + name_arr[0] + "(disconnect) ");
+      user_text1.setColor('#ff3c4a');
+    }
+    else if(text_index == 1){
+      user_text2.setText("Player"+ num_arr[1] +' : ' + name_arr[1] + "(disconnect) ");
+      user_text2.setColor('#ff3c4a');
+    }
+    else if(text_index == 2){
+      user_text3.setText("Player"+ num_arr[2] +' : ' + name_arr[2] + "(disconnect) ");
+      user_text3.setColor('#ff3c4a');
+    }
+    else if(text_index == 3){
+      user_text4.setText("Player"+ num_arr[3] +' : ' + name_arr[3] + "(disconnect) ");
+      user_text4.setColor('#ff3c4a');
+    }
   });
 
 }
