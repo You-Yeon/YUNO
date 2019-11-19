@@ -365,4 +365,12 @@ router.get('/assets/o_shield_icon', function(req, res){
     res.sendFile(__dirname + '/assets/o_shield_icon.png');
 });
 
+router.get('/assets/win', function(req, res){
+    res.sendFile(__dirname + '/assets/win.png');
+});
+
+router.get('/assets/lose', function(req, res){
+    res.sendFile(__dirname + '/assets/lose.png');
+});
+
 module.exports = router;

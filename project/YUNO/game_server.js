@@ -676,6 +676,9 @@ io.on('connection', function(socket){
     var turn = g_turn_is[r_num];
     var d_length = g_dummy_cards[r_num].length;
 
+    if(temp[0] == 0){
+      temp = new Array();
+    }
     io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, field, bombs, turn, d_length);
 
   });
@@ -686,13 +689,17 @@ io.on('connection', function(socket){
     index_m = parseInt((index + move) % g_user_num[r_num].length); // 0 ~ g_user_num[r_num].length - 1
 
     var temp = g_player_cards[r_num][index_m].split('/');
-    
+
+    if(temp[0] == 0){
+      temp = new Array();
+    }
+
     if(move == 1){ // sprite2
       io.to(g_user_socketID[r_num][index]).emit('set_other_player_info2', temp);
     }
-    else if(move == 2){ // sprite3
-      io.to(g_user_socketID[r_num][index]).emit('set_other_player_info3', temp);
-    }
+    // else if(move == 2){ // sprite3
+    //   io.to(g_user_socketID[r_num][index]).emit('set_other_player_info3', temp);
+    // }
     else if(move == 3){ // sprite4
       io.to(g_user_socketID[r_num][index]).emit('set_other_player_info4', temp);
     }
@@ -704,11 +711,10 @@ io.on('connection', function(socket){
     var index = g_user_num[r_num].indexOf(u_num);
     index_m = parseInt((index + move) % g_user_num[r_num].length); // 0 ~ g_user_num[r_num].length - 1
 
-    console.log("g_user_num[r_num] :" + g_user_num[r_num]);
-    console.log("index :"+ index);
-    console.log("move :"+ move);
-    console.log("index_m :" + index_m);
     var temp = g_player_cards[r_num][index_m].split('/');
+    if(temp[0] == 0){
+      temp = new Array();
+    }
     
     io.to(g_user_socketID[r_num][index]).emit('set_other_player_info3', temp);
 
@@ -739,6 +745,9 @@ io.on('connection', function(socket){
       if(temp_split[1] == 'c'){ // *** step1 change color card
         // set cards
         temp.splice(_index,1);
+        if(temp.length == 0){
+          temp.push(0);
+        }
         g_player_cards[r_num][index] = temp.join('/');
         
         io.to(g_user_socketID[r_num][index]).emit('set_player_info', temp, '0_0', 0, 0, 0); // block player cards
@@ -760,17 +769,20 @@ io.on('connection', function(socket){
         }
   
         if(temp_split[1] == 'color'){ // *** step3 change color card
-          // push the field card
-          g_field_card[r_num].push(temp);
+          g_field_card[r_num].push(temp); // push the field card
 
           for(var i = 0; i < g_user_socketID[r_num].length; i++){ // set the color board state
             io.to(g_user_socketID[r_num][i]).emit('set_color_board_state', 0);
           }
+
         }
         else{
           // set cards and push the field card
           g_field_card[r_num].push(temp[_index]);
           temp.splice(_index,1);
+          if(temp.length == 0){
+            temp.push(0);
+          }
           g_player_cards[r_num][index] = temp.join('/');
 
         }
@@ -889,6 +901,21 @@ io.on('connection', function(socket){
   
         for(var i = 0; i < g_user_socketID[r_num].length; i++){
           io.to(g_user_socketID[r_num][i]).emit('refresh');
+        }
+
+        if(temp[0] == 0){ // *****  WIN ! ***** 
+          index = g_user_num[r_num].indexOf(u_num);
+
+          for(var i = 0; i < g_user_socketID[r_num].length; i++){
+            if(i == index){
+              io.to(g_user_socketID[r_num][i]).emit('win'); // win
+            }
+            else{
+              io.to(g_user_socketID[r_num][i]).emit('lose'); // lose
+            }
+            io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // all player blocking
+
+          }
         }
 
       }

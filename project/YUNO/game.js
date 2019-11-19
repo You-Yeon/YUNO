@@ -143,6 +143,9 @@ function preload ()
   this.load.image('u_shield_icon', '/assets/u_shield_icon');
   this.load.image('o_shield_icon', '/assets/o_shield_icon');
 
+  this.load.image('win', '/assets/win');
+  this.load.image('lose', '/assets/lose');
+
   // load audio
   this.load.audio('card_sound', ['assets/taking_card_sound.mp3','assets/taking_card_sound.ogg']);
   this.load.audio('bomb_sound', ['assets/bomb_sound.mp3', 'assets/bomb_sound.ogg']);
@@ -1083,12 +1086,12 @@ function create ()
     
     console.log("set_player_info");
     console.log("player_arr :" + player_arr);
+    console.log("player_arr.length :"+ player_arr.length);
   
     var field_split = _field.split("_"); 
     var temp_split;
 
     if(player_arr.length == 0){
-      sprite1.destroy();
       sprite1.visible = false;
     }
     else if(player_arr.length < 20){
@@ -1458,7 +1461,10 @@ function create ()
 
         for(var i=0; i<player_arr.length; i++)
         {
-          if(player_arr.length <= 12){
+          if(player_arr.length == 0){
+            sprite2.visible = false;
+          }
+          else if(player_arr.length <= 12){
             if(i < 11){
               var sprite = sprite2.create(815,340-i*20,'other_card')
               sprite.angle += 270;
@@ -1490,7 +1496,10 @@ function create ()
 
         for(var i=0; i<player_arr.length; i++)
         {
-          if(player_arr.length <= 12){
+          if(player_arr.length == 0){
+            sprite3.visible = false;
+          }
+          else if(player_arr.length <= 12){
             if(i < 11){
               var sprite = sprite3.create(547-i*20,73,'other_card')
               sprite.angle += 180;
@@ -1522,7 +1531,10 @@ function create ()
 
       for(var i=0; i<player_arr.length; i++)
       {
-        if(player_arr.length <= 12){
+        if(player_arr.length == 0){
+          sprite4.visible = false;
+        }
+        else if(player_arr.length <= 12){
           if(i < 11){
             var sprite = sprite4.create(85,114+i*20,'other_card')
             sprite.angle += 90;
@@ -1921,6 +1933,7 @@ function create ()
     player_yuno_state = state;
   });
 
+  // ----- refresh only the player cards
   game.socket.on('refresh_only_player_cards', function(){
     // player1
     get_card(_this);
@@ -1939,6 +1952,17 @@ function create ()
     }
 
   });
+
+  // ----- win !
+  game.socket.on('win', function(){
+    _this.add.image(450,300,'win');
+  });
+
+  // ----- lose
+  game.socket.on('lose', function(){
+    _this.add.image(450,300,'lose');
+  });
+
 }
 
 function other_card(_this,num) {
