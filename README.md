@@ -143,7 +143,7 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
     + 쉴드와 어택 중 고르는 보드가 생성될 경우, 선택하기 전까지는 모든 플레이어가 YUNO 버튼, 카드, 더미를 낼 수 없다.  
     
     *( 이미지를 클릭하면 유튜브로 넘어갑니다. )*
-      [![Yuno_capture](https://user-images.githubusercontent.com/44610250/69263797-5d6ec180-0c09-11ea-81e9-5572e6349435.png)](https://www.youtube.com/watch?v=MahG3-dYZlY&feature=youtu.be)
+      [![Yuno_capture](https://user-images.githubusercontent.com/44610250/69263797-5d6ec180-0c09-11ea-81e9-5572e6349435.png)](https://www.youtube.com/watch?v=Te5AyJLj8OY&feature=youtu.be)
       
 <hr/>
 
