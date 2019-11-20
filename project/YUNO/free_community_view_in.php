@@ -311,8 +311,11 @@
 
         </h2>
 
-        <form name="game_start_form">
-            <input type="button" onclick="on_start_click();" name="btn1" value="GAME START" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:380px; height:80px; margin:5px; color:#FFF666; font-size:35pt; background-color: #07C830;" >
+        <form name="game_start_form" action="http://localhost:9877/" method="post">
+          <input type= "hidden" name="name" value = "<?php echo $user_name; ?>">
+          <input type= "hidden" name="win" value = "<?php echo $user_wins; ?>">
+          <input type= "hidden" name="lose" value = "<?php echo $user_losses; ?>">
+          <input type="submit" name="btn1" value="GAME START" color="#FFF666" style="font-family:Dotspitch; text-decoration:none; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black; text-align:center; width:360px; height:80px; margin:5px; color:#FFF666; font-size:35pt; background-color: #07C830;" >
         </form>
 
       </div>
@@ -329,9 +332,9 @@
 
     <script>
 
-        function on_start_click() {
-           alert("게임 시작");
-         }
+        // function on_start_click() {
+        //    alert("게임 시작");
+        //  }
 
         function com_input(){
           var com_content = document.getElementById("com_content").value;

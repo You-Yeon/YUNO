@@ -168,7 +168,7 @@ var Shuffle_cards = function(room_num, user_count){
 
   // player cards
   for(var i = 0; i < user_count; i++){
-    for(var j = 0; j < 1; j++)
+    for(var j = 0; j < 7; j++)
     {
       k = parseInt(Math.random()*g_dummy_cards[room_num].length);
       temp.push(g_dummy_cards[room_num][k]);
