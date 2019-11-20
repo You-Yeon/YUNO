@@ -82,12 +82,27 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
       상대방이 한장 남았으면 상대방이 카드를 두장 먹고,  
       본인이 한장 남았으면 쉴드 효과가 생깁니다.  
       둘 중 아무것도 아니라면 ( 실수라고 간주함. )  외친사람이 카드 두장을 먹습니다.  
-      ( YUNO는 턴당 한번만 외칠 수 있습니다. )  
+      *( YUNO는 턴당 한번만 외칠 수 있습니다. )*  
       
       ![yuno_1](https://user-images.githubusercontent.com/44610250/69241816-ede5db80-0be2-11ea-8c31-80f3776ad7c1.gif)
       
   - 쉴드 효과
+    + 쉴드 효과가 나타나면 상대방이 YUNO를 외쳐도 카드를 먹지 않습니다.  
+      하지만 2장 이상으로 변하면 쉴드를 사라집니다.  
+      
+      ![yuno_2](https://user-images.githubusercontent.com/44610250/69242369-10c4bf80-0be4-11ea-93aa-d7b55c0cc451.gif)
+      
   - 어택 효과
+    + 어택 효과는 상대방이 카드를 두장 먹는 것을 말합니다.  
+    
+      ![yuno_3](https://user-images.githubusercontent.com/44610250/69242366-10c4bf80-0be4-11ea-99c8-d969f1fde648.gif)
+      
+  - 쉴드와 어택 중 선택하는 경우
+    + 상대방도 한장이고 본인도 한장인 경우에는   
+      쉴드 효과를 쓸 것인지, 어택 효과를 쓸 것인지 고를 수 있습니다.  
+      
+      ![yuno_4](https://user-images.githubusercontent.com/44610250/69242680-b5470180-0be4-11ea-9560-b0cd38935c47.gif)
+      
   - 승패 처리
 <hr/>
 
