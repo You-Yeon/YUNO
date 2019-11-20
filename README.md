@@ -8,6 +8,16 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
 2~4명이 즐길 수 있는 온라인 카드게임입니다.  
 *( 모든 assets은 직접 그렸습니다. )*
 
+:computer: Developerment skill
+------------
+- 웹 서버 : Apache v2.4.41
+- 라이브러리 : socket.io
+- 언어 : HTML, CSS, PHP, JavaScript
+- 데이터베이스 : MySQL v5.7.28
+- 프로토콜 : WebSocket, HTTP
+- 게임 엔진 : Phaser v3.17.0 
+- IDE : Visual Studio Code  
+
 :black_joker: Description
 -----------
 * ### 카드 게임
