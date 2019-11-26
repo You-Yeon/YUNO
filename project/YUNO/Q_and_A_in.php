@@ -225,7 +225,7 @@
 
         </h2>
 
-        <form name="game_start_form" action="http://localhost:9877/" method="post">
+        <form name="game_start_form" action="http://localhost:9877/" method="post" target="_blank">
           <input type= "hidden" name="name" value = "<?php echo $user_name; ?>">
           <input type= "hidden" name="win" value = "<?php echo $user_wins; ?>">
           <input type= "hidden" name="lose" value = "<?php echo $user_losses; ?>">

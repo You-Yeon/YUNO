@@ -2294,6 +2294,14 @@ function create ()
     }
   });
 
+  // ----- del cookies..
+  game.socket.on('del_cookies', function(){
+    setCookie('CNT', '');
+    setCookie('NAME', '');
+    setCookie('P_NUM', '');
+    setCookie('R_NUM', '');
+  });
+
 }
 
 function other_card(_this,num) {

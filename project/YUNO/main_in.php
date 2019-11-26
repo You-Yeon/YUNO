@@ -177,11 +177,28 @@
         exit;
       }
 
+      $sql_host = 'localhost';
+      $sql_user = 'yuyeon';
+      $sql_pw = '0607';
+      $sql_dbName = 'yuno';
+    
+      $mysqli = new mysqli($sql_host, $sql_user, $sql_pw, $sql_dbName);
+      
       $user_id = $_SESSION['user_id'];
       $user_name = $_SESSION['user_name'];
-      $user_wins = $_SESSION['user_wins'];
-      $user_losses = $_SESSION['user_losses'];
       $user_authority = $_SESSION['user_authority'];
+
+      $win_sql = "select wins from user where id='$user_id'";
+      $win_result = $mysqli->query($win_sql);
+      $win_row = $win_result->fetch_array();
+
+      $user_wins = $win_row[0];
+
+      $lose_sql = "select losses from user where id='$user_id'";
+      $lose_result = $mysqli->query($lose_sql);
+      $lose_row = $lose_result->fetch_array();
+
+      $user_losses = $lose_row[0];
     ?>
     <div id="jb-container">
 
@@ -254,7 +271,7 @@
 
         </h2>
 
-        <form name="game_start_form" action="http://localhost:9877/" method="post">
+        <form name="game_start_form" action="http://localhost:9877/" method="post" target="_blank">
           <input type= "hidden" name="name" value = "<?php echo $user_name; ?>">
           <input type= "hidden" name="win" value = "<?php echo $user_wins; ?>">
           <input type= "hidden" name="lose" value = "<?php echo $user_losses; ?>">

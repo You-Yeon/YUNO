@@ -10,6 +10,16 @@ var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'yuyeon',
+  password : '0607',
+  port     : '3306',
+  database : 'yuno'
+});
+connection.connect();
+
 app.use(bodyParser.urlencoded({ sextended: false }));
 app.use(cookieParser());
 
@@ -39,7 +49,7 @@ var state;
 
 app.get('/',function(req, res){  
 
-  res.send(`<script> alert("잘못된 접근"); history.back(); </script>`);
+  res.send(`<script> alert("잘못된 접근"); window.close(); </script>`);
 
 });
 
@@ -48,6 +58,26 @@ app.post('/',function(req, res){
   name = req.param('name');
   win = req.param('win');
   lose = req.param('lose');
+
+  // overlap user 
+  connection.query('SELECT in_game FROM user WHERE name = \''+ name + '\'', function(err, rows, fields) {
+    if (!err){
+      if(rows[0].in_game == 1){
+        res.send(`<script> alert("이미 접속중인 아이디입니다."); window.close(); </script>`);
+      }
+      console.log('The solution is: ', rows[0]);
+    }
+    else
+      console.log('Error while performing Query.', err);
+  });
+
+  // UPDATE game state
+  connection.query('UPDATE user SET in_game = 1 WHERE name = \''+ name + '\'', function(err, rows, fields) {
+    if (!err)
+      console.log('The solution is: ', rows);
+    else
+      console.log('Error while performing Query.', err);
+  });
 
   //make cookie
   res.cookie('NAME',name);
@@ -186,6 +216,7 @@ io.on('connection', function(socket){
       else{ // start  
         for( var i = 0; i < user_socketID[room_num].length; i++){
           io.to(user_socketID[room_num][i]).emit('start', user_name[room_num][i],  user_num[room_num][i], user_state[room_num][i], user_num[room_num].length);
+
         }
 
       }
@@ -223,6 +254,17 @@ io.on('connection', function(socket){
           io.to(user_socketID[room_num][i]).emit('change value',user_name[room_num][j], user_wins[room_num][j], user_losses[room_num][j], user_state[room_num][j], user_num[room_num][j]);
       }
     }
+  });
+
+  socket.on('out_game', function(name){
+    // UPDATE game state
+    connection.query('UPDATE user SET in_game = 0 WHERE name = \''+ name + '\'', function(err, rows, fields) {
+      if (!err)
+        console.log('The solution is: ', rows);
+      else
+        console.log('Error while performing Query.', err);
+    });
+  
   });
 
   socket.on('send message', function(name,text){

@@ -442,8 +442,16 @@
 
       });
 
+      $(window).bind("beforeunload", function (e){
+        // set in_game data
+        socket.emit('out_game', $('#name').val());
+
+      });
+
       function exit(){
-        history.back();
+        // set in_game data
+        socket.emit('out_game', $('#name').val());
+        window.close();
       }
 
     </script>

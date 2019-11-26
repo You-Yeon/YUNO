@@ -70,7 +70,7 @@ var room_count = 0;
 
 app.get('/',function(req, res){  //2
 
-  res.send(`<script> alert("잘못된 접근"); history.back(); </script>`);
+  res.send(`<script> alert("잘못된 접근"); window.close(); </script>`);
 
 });
 
@@ -86,6 +86,14 @@ app.post('/',function(req, res){
   console.log("user_num :" + req.param('user_num'));
   console.log("user_state :" + req.param('user_state'));
   console.log("user_cnt :" + req.param('user_cnt'));
+
+  // UPDATE game state
+  connection.query('UPDATE user SET in_game = 1 WHERE name = \''+ g_name + '\'', function(err, rows, fields) {
+    if (!err)
+      console.log('The solution is: ', rows);
+    else
+      console.log('Error while performing Query.', err);
+  });
 
   // make array
   if(g_user_name[room_count] === undefined){
@@ -801,10 +809,18 @@ io.on('connection', function(socket){
     }
     else{ // if not change color card _index is index
       temp = g_player_cards[r_num][index].split('/');
-      temp_split = temp[_index].split("_"); // find value
+
+      if(_index < temp.length){
+        temp_split = temp[_index].split("_"); // find value
+      }
+      else{
+        temp_split = 'err'; // out of memory
+      }
+
+      console.log("temp_split : "+ temp_split);
     }
 
-    if(temp[_index] || _index == 'y_color' || _index == 'r_color' || _index == 'g_color' || _index == 'b_color'){ // When player have the card
+    if(( temp_split != 'err' && temp[_index]) || _index == 'y_color' || _index == 'r_color' || _index == 'g_color' || _index == 'b_color'){ // When player have the card
       console.log("temp[_index] :" + temp[_index]);
 
       // when player card is change color card
@@ -992,6 +1008,14 @@ io.on('connection', function(socket){
                   console.log('Error while performing Query.', err);
               });
             }
+            // set in game state
+            connection.query('UPDATE user SET in_game = 0 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+              if (!err)
+                console.log('The solution is: ', rows);
+              else
+                console.log('Error while performing Query.', err);
+            });
+
             io.to(g_user_socketID[r_num][i]).emit('set_shield_attack_board_state', 1); // all player blocking
 
           }
@@ -1018,6 +1042,9 @@ io.on('connection', function(socket){
         }
       }
     }
+
+    // del cookies..    
+    io.to(g_user_socketID[r_num][index]).emit('del_cookies'); 
 
     if(g_end[r_num] == 0){ // adnormal game
       var text_index = g_text_info_name[r_num].indexOf(g_user_name[r_num][index]);
@@ -1070,6 +1097,14 @@ io.on('connection', function(socket){
           console.log('Error while performing Query.', err);
       });
 
+      // set in game state
+      connection.query('UPDATE user SET in_game = 0 WHERE name = \''+ g_user_name[r_num][index] + '\'', function(err, rows, fields) {
+        if (!err)
+          console.log('The solution is: ', rows);
+        else
+          console.log('Error while performing Query.', err);
+      });
+
       // remove..
       g_user_name[r_num].splice(index, 1);
       g_user_socketID[r_num].splice(index, 1);
@@ -1106,6 +1141,14 @@ io.on('connection', function(socket){
               console.log('Error while performing Query.', err);
           });
         }
+        // set in game state
+        connection.query('UPDATE user SET in_game = 0 WHERE name = \''+ g_user_name[r_num][i] + '\'', function(err, rows, fields) {
+            if (!err)
+              console.log('The solution is: ', rows);
+            else
+              console.log('Error while performing Query.', err);
+        });
+
         io.to(g_user_socketID[r_num][i]).emit('set_player_score', name_arr2, score_arr, 1);
       }
       
@@ -1162,17 +1205,6 @@ io.on('connection', function(socket){
         console.log("remove g_end :" + g_end);
       }
     }
-  
-
-    // //del data
-    // var temp = user_socketID[room_num].indexOf(socket.id);
-  
-    // user_name[room_num].splice(temp,1);
-    // user_num[room_num].splice(temp,1);
-    // user_wins[room_num].splice(temp,1);
-    // user_losses[room_num].splice(temp,1);
-    // user_state[room_num].splice(temp,1);
-    // user_socketID[room_num].splice(temp,1);
   
   });
 

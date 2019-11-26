@@ -7,7 +7,8 @@ wins int(5) unsigned default '0' not null,
 losses int(5) unsigned default '0' not null,
 authority bool not null,
 firstDate datetime not null,
-lastDate datetime not null
+lastDate datetime not null,
+in_game bool
 );
 
 grant all privileges on *.* to 'root'@'localhost' identified by '0607';
