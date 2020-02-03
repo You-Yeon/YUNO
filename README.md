@@ -20,7 +20,11 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
 
 :black_joker: Description
 -----------
-* ### 카드 게임
+* ### 카드 게임  
+  
+    *( 이미지를 클릭하면 유튜브로 넘어갑니다. )*
+      [![Yuno_capture](https://user-images.githubusercontent.com/44610250/69263797-5d6ec180-0c09-11ea-81e9-5572e6349435.png)](https://www.youtube.com/watch?v=Te5AyJLj8OY&feature=youtu.be)  
+      
   - 게임 시작을 누르면 게임 방으로 이동합니다.   
     게임 방은 자동으로 생성이 되고 랜덤으로 유저가 게임방에 입장합니다.   
     유저가 입장하면 채팅창에 유저가 입장했다고 알립니다.  
@@ -142,8 +146,6 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
       그 이후에 카드를 내게되면 필드에 카드가 쌓이게 되므로 더미의 카드가 생긴다.
     + 쉴드와 어택 중 고르는 보드가 생성될 경우, 선택하기 전까지는 모든 플레이어가 YUNO 버튼, 카드, 더미를 낼 수 없다.  
     
-    *( 이미지를 클릭하면 유튜브로 넘어갑니다. )*
-      [![Yuno_capture](https://user-images.githubusercontent.com/44610250/69263797-5d6ec180-0c09-11ea-81e9-5572e6349435.png)](https://www.youtube.com/watch?v=Te5AyJLj8OY&feature=youtu.be)
       
 <hr/>
 
