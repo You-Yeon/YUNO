@@ -67,8 +67,8 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
       
       ![bomb](https://user-images.githubusercontent.com/44610250/69240352-a01ba400-0bdf-11ea-948c-550e30654c68.gif)
       
-  - 스킾 효과
-    + 스킾 카드를 내면 다음 차례를 건너뛰게 됩니다.   
+  - 스킵 효과
+    + 스킵 카드를 내면 다음 차례를 건너뛰게 됩니다.   
       2명이 플레이할 경우에는 상대방이 한명이기에 다시 본인차례로 돌아옵니다.  
       
       ![skip](https://user-images.githubusercontent.com/44610250/69240779-8fb7f900-0be0-11ea-9247-eab12c1d531a.gif)
