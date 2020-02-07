@@ -74,7 +74,7 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
       ![skip](https://user-images.githubusercontent.com/44610250/69240779-8fb7f900-0be0-11ea-9247-eab12c1d531a.gif)
       
   - 방향 바꾸기
-    + 방향 카드를 내면 게임 방향을 반대로 바꿉니다.  
+    + 방향 카드를 내면 게임 진행 방향을 반대로 바꿉니다.  
       필드에 있는 동그라미 화살표가 시계방향으로 변합니다.  
       
       ![arrow](https://user-images.githubusercontent.com/44610250/69240973-0523c980-0be1-11ea-8eff-b590fc94d324.gif)
