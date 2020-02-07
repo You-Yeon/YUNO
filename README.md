@@ -62,7 +62,7 @@ YUNO는 1971년에 나온 우노(UNO)를 모티브한 카드게임입니다.
        ![image](https://user-images.githubusercontent.com/44610250/69240416-c5101700-0bdf-11ea-9e45-8e56a269ee3f.png)
 
   - 폭탄 효과
-    + 폭탄 카드를 내면 더미카드위에 폭탄 모양과 폭탄 카운트가 세겨집니다.  
+    + 폭탄 카드를 내면 더미카드위에 폭탄 모양과 폭탄 카운트가 새겨집니다.  
       그리고 폭탄 모양이 그려진 더미카드를 누르게 되면 폭탄을 맞게되어 폭탄 카운트만큼 카드를 얻게됩니다.  
       
       ![bomb](https://user-images.githubusercontent.com/44610250/69240352-a01ba400-0bdf-11ea-948c-550e30654c68.gif)
